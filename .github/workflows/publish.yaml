@@ -53,11 +53,11 @@ jobs:
           changelog: ${{ steps.changelog.outputs.content }}
 
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          modrinth-id: EMPTY
+          modrinth-id: 8cCfmdw2
           modrinth-featured: false
 
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          curseforge-id: EMPTY
+          curseforge-id: 842545
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-tag: ${{ steps.versions.outputs.mod_version }}+mc.${{ steps.versions.outputs.minecraft_version }}
