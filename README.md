@@ -1,5 +1,8 @@
 # Power Networks
-*Power Networks adds the ability to create networks of wires and coils for a more interesting and slightly more realistic power transfer.*
+[![Badge showing the amount of downloads on modrinth](https://img.shields.io/badge/dynamic/json?color=2d2d2d&colorA=5da545&label=&suffix=%20downloads%20&query=downloads&url=https://api.modrinth.com/v2/project/8cCfmdw2&style=flat-square&logo=modrinth&logoColor=2d2d2d)](https://modrinth.com/mod/power-networks)
+[![Badge showing the amount of downloads on curseforge](https://cf.way2muchnoise.eu/full_842545_downloads.svg?badge_style=flat)](https://www.curseforge.com/minecraft/mc-mods/power-networks)
+[![Badge linking to issues on github](https://img.shields.io/badge/dynamic/json?query=value&url=https%3A%2F%2Fimg.shields.io%2Fgithub%2Fissues-raw%2Fmattidragon%2Fpowernetworks.json&label=&logo=github&color=2d2d2d&style=flat-square&labelColor=6e5494&logoColor=2d2d2d&suffix=%20issues)](https://github.com/MattiDragon/PowerNetworks/issues)
+[![Badge linking to support on discord](https://img.shields.io/discord/760524772189798431?label=&logo=discord&color=2d2d2d&style=flat-square&labelColor=5865f2&logoColor=2d2d2d)](https://discord.gg/26T5KK2PBv)
 
 This mod adds coils and wires that you can use to build energy transfer networks. 
 There are four tiers of coils: basic, improved, advanced and ultimate.
