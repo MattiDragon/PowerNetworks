@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "I": {
+      "item": "minecraft:copper_ingot"
+    },
+    "N": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "pattern": [
+    "NNN",
+    "III"
+  ],
+  "result": {
+    "count": 16,
+    "item": "power_networks:wire"
+  },
+  "show_notification": true
+}

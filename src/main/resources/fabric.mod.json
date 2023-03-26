@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "power_networks",
+  "version": "${version}",
+  "name": "Power Networks",
+  "description": "Adds the ability to create networks of wires and coils for a more interesting and slightly more realistic power transfer.",
+  "authors": [
+    "MattiDragon"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/extended-drawers",
+    "sources": "https://github.com/MattiDragon/power-networks",
+    "issues": "https://github.com/MattiDragon/power-networks/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/power_networks/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.mattidragon.powernetworks.PowerNetworks"
+    ],
+    "client": [
+      "io.github.mattidragon.powernetworks.client.PowerNetworksClient"
+    ],
+    "fabric-datagen": [
+      "io.github.mattidragon.powernetworks.datagen.PowerNetworksDatagen"
+    ],
+    "preLaunch": [
+      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
+    ],
+    "modmenu": [
+      "io.github.mattidragon.powernetworks.client.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "power_networks.mixins.json",
+    {
+      "config": "power_networks_client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "accessWidener": "power_networks.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.14.14",
+    "minecraft": ">=1.19.4",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}

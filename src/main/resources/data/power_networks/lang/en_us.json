@@ -1,0 +1,13 @@
+{
+  "itemGroup.power_networks.content": "Power Networks",
+
+  "item.power_networks.wire": "Wire",
+  "block.power_networks.basic_coil": "Basic Coil",
+  "block.power_networks.improved_coil": "Improved Coil",
+  "block.power_networks.advanced_coil": "Advanced Coil",
+  "block.power_networks.ultimate_coil": "Ultimate Coil",
+  "block.power_networks.coil.buffer_size": "Buffer Size: %s",
+
+  "command.power_networks.reload.fail": "Failed to reload config",
+  "command.power_networks.reload.success": "Reloaded power networks config"
+}

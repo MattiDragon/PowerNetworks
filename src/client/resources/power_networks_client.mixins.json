@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.mattidragon.powernetworks.client.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+  ]
+}

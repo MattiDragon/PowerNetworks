@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "I": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "W": {
+      "item": "power_networks:wire"
+    }
+  },
+  "pattern": [
+    " W ",
+    "WIW",
+    " W "
+  ],
+  "result": {
+    "count": 2,
+    "item": "power_networks:ultimate_coil"
+  },
+  "show_notification": true
+}

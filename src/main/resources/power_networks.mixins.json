@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.mattidragon.powernetworks.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "EntityAttachS2CPacketAccess",
+    "ServerPlayerEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}

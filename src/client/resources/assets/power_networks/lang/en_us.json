@@ -1,0 +1,27 @@
+{
+  "config.power_networks": "Power Networks",
+  "config.power_networks.transfer_rates": "Transfer Rates",
+  "config.power_networks.transfer_rates.basic": "Basic",
+  "config.power_networks.transfer_rates.improved": "Improved",
+  "config.power_networks.transfer_rates.advanced": "Advanced",
+  "config.power_networks.transfer_rates.ultimate": "Ultimate",
+
+  "config.power_networks.textures": "Textures",
+  "config.power_networks.textures.coils": "Coil Textures",
+  "config.power_networks.textures.basicCoil": "Basic Coil",
+  "config.power_networks.textures.improvedCoil": "Improved Coil",
+  "config.power_networks.textures.advancedCoil": "Advanced Coil",
+  "config.power_networks.textures.ultimateCoil": "Ultimate Coil",
+  "config.power_networks.textures.indicators": "Indicators",
+  "config.power_networks.textures.inputIndicator": "Input Indicator",
+  "config.power_networks.textures.outputIndicator": "Output Indicator",
+  "config.power_networks.textures.wire": "Wire Item",
+
+  "config.power_networks.misc": "Misc",
+  "config.power_networks.misc.useDoubleLeads": "Use Double Leads",
+  "config.power_networks.misc.useDoubleLeads.tooltip1": "Uses two leads for connections instead of one.",
+  "config.power_networks.misc.useDoubleLeads.tooltip2": "Causes minor z-fighting but always stays visible.",
+
+  "screen.power_networks.disconnect.title": "Do you want to close the world?",
+  "screen.power_networks.disconnect.message": "You have changed options that require reopening the world. If you do not close the world some changes may only partially apply. You can fully apply the changes by closing the world."
+}
