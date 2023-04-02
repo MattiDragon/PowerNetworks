@@ -23,8 +23,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void power_networks$handleHeldWire(CallbackInfo ci) {
-        var mainStack = getMainHandStack();
-        handleSingleHeldWire(mainStack);
+        handleSingleHeldWire(getMainHandStack());
     }
 
     private void handleSingleHeldWire(ItemStack stack) {

@@ -9,8 +9,8 @@
   ],
   "contact": {
     "homepage": "https://modrinth.com/mod/extended-drawers",
-    "sources": "https://github.com/MattiDragon/power-networks",
-    "issues": "https://github.com/MattiDragon/power-networks/issues"
+    "sources": "https://github.com/MattiDragon/powernetworks",
+    "issues": "https://github.com/MattiDragon/powernetworks/issues"
   },
   "license": "MIT",
   "icon": "assets/power_networks/icon.png",
@@ -24,9 +24,6 @@
     ],
     "fabric-datagen": [
       "io.github.mattidragon.powernetworks.datagen.PowerNetworksDatagen"
-    ],
-    "preLaunch": [
-      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
     ],
     "modmenu": [
       "io.github.mattidragon.powernetworks.client.config.ModMenuIntegration"

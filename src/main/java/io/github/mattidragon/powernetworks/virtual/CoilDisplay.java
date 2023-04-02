@@ -80,7 +80,7 @@ public class CoilDisplay {
                     var pos2 = link.other(node.get()).data().getPos();
                     if (pos.getY() < pos2.getY()) {
                         continue;
-                    } else if (pos.equals(pos2) && node.get() == link.first()) {
+                    } else if (pos.getY() == pos2.getY() && node.get() == link.first()) {
                         continue;
                     }
                 }
@@ -142,7 +142,7 @@ public class CoilDisplay {
             var transform = createRotatedMatrix(state);
             transform.rotate(RotationAxis.NEGATIVE_Z.rotationDegrees(180));
             transform.scale(0.5001f);
-            transform.translate(0, 1.001f, 0);
+            transform.translate(0, 0.99f, 0);
             indicator.setTransformation(transform);
             holder.addElement(indicator);
         }

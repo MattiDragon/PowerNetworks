@@ -25,8 +25,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
 
     // Mixin Extras
-    include implementation("com.github.LlamaLad7:MixinExtras:$mixin_extras_version")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:$mixin_extras_version")
+    include(annotationProcessor(implementation("com.github.LlamaLad7.mixinextras:mixinextras-fabric:$mixin_extras_version")))
 
     // Core apis for the mod
     modImplementation include("eu.pb4:polymer-core:$polymer_version")
