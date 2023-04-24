@@ -6,6 +6,7 @@ import com.kneelawk.graphlib.GraphLib;
 import com.kneelawk.graphlib.graph.BlockGraph;
 import com.kneelawk.graphlib.graph.BlockNodeHolder;
 import com.kneelawk.graphlib.graph.struct.Node;
+import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
 import io.github.mattidragon.powernetworks.block.CoilBlockEntity;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -15,6 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class NetworkUpdateHandler {
@@ -44,11 +46,11 @@ public class NetworkUpdateHandler {
     private static void tickGraph(ServerWorld world, BlockGraph graph) {
         TICKED.put(world.getRegistryKey(), graph.getId());
 
-        var coils = new ArrayList<>(graph.getNodes()
+        var coils = graph.getNodes()
                 .filter(node -> node.data().getNode() instanceof CoilNode)
                 .map(node -> CoilBlock.getBlockEntity(world, node.data().getPos()))
                 .filter(Objects::nonNull)
-                .toList());
+                .toList();
 
         try (var transaction = Transaction.openOuter()) {
             // Calculate how much space the combined output buffers have, we can't move more than this
@@ -78,12 +80,18 @@ public class NetworkUpdateHandler {
             coils or concurrent changes. If this remains after a round we throw an error, causing the transaction to abort and probably
             crashing the game.
             */
+            var activeCoils = new ArrayList<>(coils);
             var coilsToRemove = new ArrayList<CoilBlockEntity>();
             while (movingEnergy > 0) {
                 var roundTotal = 0L;
-                var coilCount = coils.size();
-                for (var coil : coils) {
-                    var inserted = coil.storage.outputBuffer.insert(movingEnergy / coilCount--, transaction);
+                var coilCount = activeCoils.size();
+                for (var coil : activeCoils) {
+                    if (movingEnergy <= 0) break;
+                    // If we don't allow at least one energy to move we can get stuck with early coils not getting any energy even when they have space.
+                    var maxAmount = Math.max(movingEnergy / coilCount, 1);
+                    coilCount--;
+
+                    var inserted = coil.storage.outputBuffer.insert(maxAmount, transaction);
                     if (inserted == 0) {
                         coilsToRemove.add(coil);
                     } else {
@@ -92,11 +100,17 @@ public class NetworkUpdateHandler {
                         coil.markDirty();
                     }
                 }
-                coils.removeAll(coilsToRemove);
+                activeCoils.removeAll(coilsToRemove);
                 coilsToRemove.clear();
 
-                if (roundTotal <= 0)
-                    throw new IllegalStateException("Energy transaction failed, no coil is accepting energy, but still have %s left".formatted(movingEnergy));
+                if (roundTotal <= 0) {
+                    PowerNetworks.LOGGER.error("Energy distribution failed: no coil is accepting energy, but still have {} left. The distribution has been canceled. Graph id: {}, Involved coils: {}",
+                            movingEnergy,
+                            graph.getId(),
+                            coils.stream().map(CoilBlockEntity::getPos).toList());
+                    transaction.abort();
+                    return;
+                }
             }
             transaction.commit();
         }
