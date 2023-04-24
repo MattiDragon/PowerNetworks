@@ -20,6 +20,7 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           gradle-distribution-sha-256-sum-warning: false
+
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
@@ -29,6 +30,7 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       - name: Build with Gradle
         run: ./gradlew build
 
