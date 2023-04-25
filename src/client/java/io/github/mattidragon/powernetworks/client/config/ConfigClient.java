@@ -16,11 +16,22 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 import java.awt.*;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static io.github.mattidragon.powernetworks.config.ConfigData.DEFAULT;
 
 public class ConfigClient {
+    public static final Function<Float, Text> FLOAT_FORMATTER;
+
+    static {
+        var format = NumberFormat.getNumberInstance(Locale.ROOT);
+        format.setMaximumFractionDigits(3);
+        FLOAT_FORMATTER = (value) -> Text.literal(format.format(value));
+    }
+
     public static Screen createScreen(Screen parent, ConfigData config, Consumer<ConfigData> saveConsumer) {
         var transferRates = config.transferRates().toMutable();
         var textures = config.textures().toMutable();
@@ -142,15 +153,15 @@ public class ConfigClient {
                 .option(Option.createBuilder(float.class)
                         .name(Text.translatable("config.power_networks.client.wireWidth"))
                         .binding(DEFAULT.client().wireWidth(), () -> instance.wireWidth, value -> instance.wireWidth = value)
-                        .controller(FloatFieldController::new)
+                        .controller(option1 -> new FloatFieldController(option1, 0, 1, FLOAT_FORMATTER))
                         .build())
                 .option(Option.createBuilder(float.class)
                         .name(Text.translatable("config.power_networks.client.hangFactor"))
                         .binding(DEFAULT.client().hangFactor(), () -> instance.hangFactor, value -> instance.hangFactor = value)
-                        .controller(FloatFieldController::new)
+                        .controller(option -> new FloatFieldController(option, FLOAT_FORMATTER))
                         .tooltip(Text.translatable("config.power_networks.client.hangFactor.tooltip"))
                         .build())
-                .option(ListOption.createBuilder(Color.class)
+                .group(ListOption.createBuilder(Color.class)
                         .initial(Color.BLACK)
                         .name(Text.translatable("config.power_networks.client.colors"))
                         .binding(DEFAULT.client().colors().stream().map(Color::new).toList(),
@@ -162,4 +173,5 @@ public class ConfigClient {
                         .build())
                 .build();
     }
+
 }
