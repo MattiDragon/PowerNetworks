@@ -8,7 +8,6 @@ import dev.isxander.yacl.gui.controllers.string.number.FloatFieldController;
 import dev.isxander.yacl.gui.controllers.string.number.IntegerFieldController;
 import dev.isxander.yacl.gui.controllers.string.number.LongFieldController;
 import io.github.mattidragon.powernetworks.config.ConfigData;
-import io.github.mattidragon.powernetworks.config.PowerNetworksConfig;
 import io.github.mattidragon.powernetworks.config.category.ClientCategory;
 import io.github.mattidragon.powernetworks.config.category.MiscCategory;
 import io.github.mattidragon.powernetworks.config.category.TexturesCategory;
@@ -17,12 +16,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 import java.awt.*;
+import java.util.function.Consumer;
 
 import static io.github.mattidragon.powernetworks.config.ConfigData.DEFAULT;
 
 public class ConfigClient {
-    public static Screen createScreen(Screen parent) {
-        var config = PowerNetworksConfig.get();
+    public static Screen createScreen(Screen parent, ConfigData config, Consumer<ConfigData> saveConsumer) {
         var transferRates = config.transferRates().toMutable();
         var textures = config.textures().toMutable();
         var misc = config.misc().toMutable();
@@ -34,7 +33,7 @@ public class ConfigClient {
                 .category(createTexturesCategory(textures))
                 .category(createMiscCategory(misc))
                 .category(createClientCategory(client))
-                .save(() -> PowerNetworksConfig.set(new ConfigData(transferRates.toImmutable(), textures.toImmutable(), misc.toImmutable(), client.toImmutable())))
+                .save(() -> saveConsumer.accept(new ConfigData(transferRates.toImmutable(), textures.toImmutable(), misc.toImmutable(), client.toImmutable())))
                 .build()
                 .generateScreen(parent);
     }

@@ -9,5 +9,7 @@
   "block.power_networks.coil.buffer_size": "Buffer Size: %s",
 
   "command.power_networks.reload.fail": "Failed to reload config",
-  "command.power_networks.reload.success": "Reloaded power networks config"
+  "command.power_networks.reload.success": "Reloaded power networks config",
+  "power_networks.config_edit.denied": "You do not have permission to edit the power networks config",
+  "power_networks.config_edit.applied": "Successfully updated config"
 }

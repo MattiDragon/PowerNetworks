@@ -5,10 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.JsonOps;
+import eu.pb4.polymer.networking.api.PolymerServerNetworking;
 import io.github.mattidragon.powernetworks.PowerNetworks;
+import io.github.mattidragon.powernetworks.networking.ConfigEditPackets;
+import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.HoverEvent;
@@ -55,28 +59,43 @@ public class PowerNetworksConfig {
     private static void prepare() {
         if (!prepared) {
             prepared = true;
+            // Use default config in datagen to avoid it getting out of date.
+            if (System.getProperty("fabric-api.datagen") != null) return;
+
             if (Files.exists(PATH)) {
                 load();
             } else {
                 save();
             }
             CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-                dispatcher.register(CommandManager.literal("power_networks")
-                        .requires(source -> source.hasPermissionLevel(2))
-                        .then(CommandManager.literal("reload")
-                                .executes(context -> {
-                                    try {
-                                        load();
-                                    } catch (RuntimeException e) {
-                                        var error = Text.translatable("command.power_networks.reload.fail")
-                                                .fillStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(e.toString()))));
-                                        context.getSource().sendError(error);
-                                        PowerNetworks.LOGGER.error("Failed to reload config", e);
-                                        return 0;
-                                    }
-                                    context.getSource().sendFeedback(Text.translatable("command.power_networks.reload.success"), true);
-                                    return 1;
-                                })));
+                var root = CommandManager.literal("power_networks")
+                        .requires(source -> source.hasPermissionLevel(2));
+
+                root.then(CommandManager.literal("reload")
+                        .executes(context -> {
+                            try {
+                                load();
+                            } catch (RuntimeException e) {
+                                var error = Text.translatable("command.power_networks.reload.fail")
+                                        .fillStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(e.toString()))));
+                                context.getSource().sendError(error);
+                                PowerNetworks.LOGGER.error("Failed to reload config", e);
+                                return 0;
+                            }
+                            context.getSource().sendFeedback(Text.translatable("command.power_networks.reload.success"), true);
+                            return 1;
+                        }));
+
+                if (get().misc().allowRemoteEdits() && environment.dedicated) {
+                    root.then(CommandManager.literal("edit_config")
+                            .requires(source -> source.getPlayer() != null && PolymerServerNetworking.getSupportedVersion(source.getPlayer().networkHandler, PowerNetworksNetworking.CLIENT_EDITING) == 0)
+                            .executes(context -> {
+                                ServerPlayNetworking.send(context.getSource().getPlayerOrThrow(), new ConfigEditPackets.StartEditingPacket(PowerNetworksConfig.get()));
+                                return 1;
+                            }));
+                }
+
+                dispatcher.register(root);
             });
         }
     }
