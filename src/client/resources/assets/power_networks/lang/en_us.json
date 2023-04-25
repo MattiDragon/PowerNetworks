@@ -22,6 +22,15 @@
   "config.power_networks.misc.useDoubleLeads.tooltip1": "Uses two leads for connections instead of one.",
   "config.power_networks.misc.useDoubleLeads.tooltip2": "Causes minor z-fighting but always stays visible.",
 
+  "config.power_networks.client": "Client",
+  "config.power_networks.client.segmentsPerBlock": "Segments Per Block",
+  "config.power_networks.client.segmentsPerBlock.tooltip": "Decides how many segments a blocks worth of wire should consist of.",
+  "config.power_networks.client.wireWidth": "Wire Width",
+  "config.power_networks.client.hangFactor": "Hang Factor",
+  "config.power_networks.client.hangFactor.tooltip": "Dictates how low bellow the coils the wire can go.",
+  "config.power_networks.client.colors": "Wire Colors",
+  "config.power_networks.client.colors.tooltip": "A list of colors for wire segments, will cycle.",
+
   "screen.power_networks.disconnect.title": "Do you want to close the world?",
   "screen.power_networks.disconnect.message": "You have changed options that require reopening the world. If you do not close the world some changes may only partially apply. You can fully apply the changes by closing the world."
 }

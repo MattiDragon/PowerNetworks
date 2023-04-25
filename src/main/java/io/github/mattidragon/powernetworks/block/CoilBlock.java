@@ -2,7 +2,11 @@ package io.github.mattidragon.powernetworks.block;
 
 import com.kneelawk.graphlib.GraphLib;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
+import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
+import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
+import eu.pb4.polymer.networking.api.PolymerServerNetworking;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
+import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -11,6 +15,7 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -20,6 +25,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -28,12 +35,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class CoilBlock extends RodBlock implements PolymerBlock, BlockEntityProvider {
+public class CoilBlock extends RodBlock implements PolymerBlock, PolymerClientDecoded, PolymerKeepModel, BlockEntityProvider {
     private final CoilTier tier;
 
     public CoilBlock(Settings settings, CoilTier tier) {
         super(settings);
         this.tier = tier;
+    }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
+        if (PolymerServerNetworking.getSupportedVersion(player.networkHandler, PowerNetworksNetworking.CLIENT_RENDERING) == 0)
+            return state;
+
+        return PolymerBlock.super.getPolymerBlockState(state, player);
     }
 
     @Override
@@ -72,11 +87,22 @@ public class CoilBlock extends RodBlock implements PolymerBlock, BlockEntityProv
             return ActionResult.SUCCESS;
         } else if (player.getStackInHand(hand).isEmpty()) {
             coil.cycleTransferMode();
-            player.playSound(SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3f, 0.6f);
+            if (!world.isClient)
+                player.playSound(SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3f, 0.6f);
             return ActionResult.SUCCESS;
         } else {
             return ActionResult.PASS;
         }
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return VoxelShapes.union(super.getOutlineShape(state, world, pos, context), createCuboidShape(4, 4, 4, 12, 12, 12));
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return super.getOutlineShape(state, world, pos, context);
     }
 
     @Override
@@ -89,16 +115,25 @@ public class CoilBlock extends RodBlock implements PolymerBlock, BlockEntityProv
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onStateReplaced(state, world, pos, newState, moved);
         var coil = getBlockEntity(world, pos);
-        if (coil != null && coil.display != null)
-            coil.display.clear();
+        if (coil != null) {
+            if (!newState.isOf(this))
+                coil.disconnectAllConnections();
+
+            if (coil.display != null) {
+                coil.display.clear();
+            }
+        }
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        if (world.isClient)
+            return null;
+
         return ModBlocks.COIL_BLOCK_ENTITY == type ? (BlockEntityTicker<T>) (BlockEntityTicker<CoilBlockEntity>) CoilBlockEntity::tick : null;
     }
 

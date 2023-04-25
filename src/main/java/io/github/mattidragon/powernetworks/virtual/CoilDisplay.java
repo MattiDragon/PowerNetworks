@@ -59,7 +59,7 @@ public class CoilDisplay {
         if (playerLeashes.containsKey(player))
             return;
 
-        var source = new LeashSourceElement(player.getId());
+        var source = new LeashSourceElement(player.getId(), true);
         holder.addElement(source);
         playerLeashes.put(player, source);
     }
@@ -78,11 +78,7 @@ public class CoilDisplay {
                 if (!useDoubleLeads) {
                     // If y positions are different we use the bottom one for target
                     var pos2 = link.other(node.get()).data().getPos();
-                    if (pos.getY() < pos2.getY()) {
-                        continue;
-                    } else if (pos.getY() == pos2.getY() && node.get() == link.first()) {
-                        continue;
-                    }
+                    if (pos.getY() < pos2.getY() || pos.getY() == pos2.getY() && node.get() == link.first()) continue;
                 }
 
                 var otherPos = link.other(node.get()).data().getPos();
@@ -91,7 +87,7 @@ public class CoilDisplay {
                     var coil2 = CoilBlock.getBlockEntity(serverWorld, otherPos);
                     if (coil2 == null || coil2.display == null)
                         continue;
-                    var sourceElement = new LeashSourceElement(coil2.display.leashTarget.getEntityIds().getInt(0));
+                    var sourceElement = new LeashSourceElement(coil2.display.leashTarget.getEntityIds().getInt(0), false);
                     holder.addElement(sourceElement);
                     connectionElements.put(otherPos, sourceElement);
                 }

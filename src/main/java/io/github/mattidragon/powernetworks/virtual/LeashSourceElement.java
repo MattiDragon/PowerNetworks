@@ -1,8 +1,10 @@
 package io.github.mattidragon.powernetworks.virtual;
 
+import eu.pb4.polymer.networking.api.PolymerServerNetworking;
 import eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement;
 import io.github.mattidragon.powernetworks.misc.UnsafeUtil;
 import io.github.mattidragon.powernetworks.mixin.EntityAttachS2CPacketAccess;
+import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.SlimeEntity;
@@ -15,9 +17,11 @@ import java.util.function.Consumer;
 
 public class LeashSourceElement extends GenericEntityElement {
     private final int targetId;
+    private final boolean alwaysRender;
 
-    public LeashSourceElement(int targetId) {
+    public LeashSourceElement(int targetId, boolean alwaysRender) {
         this.targetId = targetId;
+        this.alwaysRender = alwaysRender;
         dataTracker.set(SlimeEntity.SLIME_SIZE, 0);
     }
 
@@ -28,6 +32,9 @@ public class LeashSourceElement extends GenericEntityElement {
 
     @Override
     public void startWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
+        if (!alwaysRender && PolymerServerNetworking.getSupportedVersion(player.networkHandler, PowerNetworksNetworking.CLIENT_RENDERING) == 0)
+            return;
+
         super.startWatching(player, packetConsumer);
 
         // Packet constructor requires us to provide actual entities, but we don't have them, so we use unsafe and set the fields ourselves.

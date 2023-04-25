@@ -6,6 +6,7 @@ import io.github.mattidragon.powernetworks.config.PowerNetworksConfig;
 import io.github.mattidragon.powernetworks.item.ModItems;
 import io.github.mattidragon.powernetworks.network.NetworkRegistry;
 import io.github.mattidragon.powernetworks.network.NetworkUpdateHandler;
+import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -28,6 +29,7 @@ public class PowerNetworks implements ModInitializer {
 		NetworkRegistry.register();
 		ModBlocks.register();
 		ModItems.register();
+		PowerNetworksNetworking.register();
 
 		PolymerItemGroupUtils.builder(id("content")).displayName(Text.translatable("itemGroup.power_networks.content"))
 				.icon(ModItems.ADVANCED_COIL::getDefaultStack)

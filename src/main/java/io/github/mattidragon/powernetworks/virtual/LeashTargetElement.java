@@ -4,9 +4,6 @@ import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.AffineTransformation;
-import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
 
 import java.util.function.Consumer;
 

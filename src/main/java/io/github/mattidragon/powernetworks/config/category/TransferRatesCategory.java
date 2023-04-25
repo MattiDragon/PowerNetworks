@@ -6,8 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.function.Function;
 
-import static io.github.mattidragon.powernetworks.config.ConfigData.DEFAULT;
-
 public record TransferRatesCategory(long basic, long improved, long advanced, long ultimate) {
     public static final TransferRatesCategory DEFAULT = new TransferRatesCategory(256, 1024, 4096, 16384);
 

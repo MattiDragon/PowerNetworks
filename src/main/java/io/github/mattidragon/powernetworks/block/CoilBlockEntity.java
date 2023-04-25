@@ -2,19 +2,24 @@ package io.github.mattidragon.powernetworks.block;
 
 import com.kneelawk.graphlib.GraphLib;
 import io.github.mattidragon.powernetworks.misc.CoilEnergyStorage;
-import io.github.mattidragon.powernetworks.misc.CoilTransferMode;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
+import io.github.mattidragon.powernetworks.misc.CoilTransferMode;
 import io.github.mattidragon.powernetworks.network.NetworkUpdateHandler;
 import io.github.mattidragon.powernetworks.virtual.CoilDisplay;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.EnergyStorageUtil;
 
@@ -49,6 +54,8 @@ public class CoilBlockEntity extends BlockEntity {
         second.connections.add(first.pos);
         GraphLib.getController(world).updateConnections(first.pos);
         GraphLib.getController(world).updateConnections(second.pos);
+        world.updateListeners(first.pos, first.getCachedState(), first.getCachedState(), 0);
+        world.updateListeners(second.pos, second.getCachedState(), second.getCachedState(), 0);
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, CoilBlockEntity coil) {
@@ -79,9 +86,11 @@ public class CoilBlockEntity extends BlockEntity {
                 continue;
             coil2.connections.remove(pos);
             GraphLib.getController(serverWorld).updateConnections(coil2.pos);
+            world.updateListeners(coil2.pos, coil2.getCachedState(), coil2.getCachedState(), Block.NOTIFY_ALL);
         }
         connections.clear();
         GraphLib.getController(serverWorld).updateConnections(pos);
+        world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_ALL);
     }
 
     public Set<BlockPos> getConnections() {
@@ -103,10 +112,28 @@ public class CoilBlockEntity extends BlockEntity {
             display.setTransferMode(transferMode);
     }
 
+    @Nullable
+    @Override
+    public Packet<ClientPlayPacketListener> toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create(this);
+    }
+
+    @Override
+    public NbtCompound toInitialChunkDataNbt() {
+        var nbt = super.toInitialChunkDataNbt();
+        var list = new NbtList();
+        for (var connection : connections) {
+            list.add(NbtHelper.fromBlockPos(connection));
+        }
+        nbt.put("connections", list);
+        return nbt;
+    }
+
     @Override
     public void markRemoved() {
         super.markRemoved();
-        display.clear();
+        if (display != null)
+            display.clear();
     }
 
     @Override

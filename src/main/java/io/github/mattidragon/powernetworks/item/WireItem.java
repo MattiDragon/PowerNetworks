@@ -35,7 +35,7 @@ public class WireItem extends Item implements PolymerItem {
 
     /**
      * Checks if a player is holding a wire that is targeting the specified position
-     * @return { @code true } if the player is holding at least one such wire
+     * @return {@code true} if the player is holding at least one such wire
      */
     public static boolean hasAttachmentTo(ServerPlayerEntity player, BlockPos pos) {
         return pos.equals(getPos(player.getMainHandStack())) || pos.equals(getPos(player.getOffHandStack()));

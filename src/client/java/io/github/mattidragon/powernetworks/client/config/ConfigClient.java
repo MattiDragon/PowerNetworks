@@ -1,16 +1,22 @@
 package io.github.mattidragon.powernetworks.client.config;
 
 import dev.isxander.yacl.api.*;
+import dev.isxander.yacl.gui.controllers.ColorController;
 import dev.isxander.yacl.gui.controllers.TickBoxController;
 import dev.isxander.yacl.gui.controllers.string.StringController;
+import dev.isxander.yacl.gui.controllers.string.number.FloatFieldController;
+import dev.isxander.yacl.gui.controllers.string.number.IntegerFieldController;
 import dev.isxander.yacl.gui.controllers.string.number.LongFieldController;
 import io.github.mattidragon.powernetworks.config.ConfigData;
 import io.github.mattidragon.powernetworks.config.PowerNetworksConfig;
+import io.github.mattidragon.powernetworks.config.category.ClientCategory;
 import io.github.mattidragon.powernetworks.config.category.MiscCategory;
 import io.github.mattidragon.powernetworks.config.category.TexturesCategory;
 import io.github.mattidragon.powernetworks.config.category.TransferRatesCategory;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+
+import java.awt.*;
 
 import static io.github.mattidragon.powernetworks.config.ConfigData.DEFAULT;
 
@@ -20,13 +26,15 @@ public class ConfigClient {
         var transferRates = config.transferRates().toMutable();
         var textures = config.textures().toMutable();
         var misc = config.misc().toMutable();
+        var client = config.client().toMutable();
 
         return YetAnotherConfigLib.createBuilder()
                 .title(Text.translatable("config.power_networks"))
                 .category(createTransferRatesCategory(transferRates))
                 .category(createTexturesCategory(textures))
                 .category(createMiscCategory(misc))
-                .save(() -> PowerNetworksConfig.set(new ConfigData(transferRates.toImmutable(), textures.toImmutable(), misc.toImmutable())))
+                .category(createClientCategory(client))
+                .save(() -> PowerNetworksConfig.set(new ConfigData(transferRates.toImmutable(), textures.toImmutable(), misc.toImmutable(), client.toImmutable())))
                 .build()
                 .generateScreen(parent);
     }
@@ -119,6 +127,39 @@ public class ConfigClient {
                         .binding(DEFAULT.misc().useDoubleLeads(), () -> instance.useDoubleLeads, value -> instance.useDoubleLeads = value)
                         .controller(TickBoxController::new)
                         .tooltip(Text.translatable("config.power_networks.misc.useDoubleLeads.tooltip1"), Text.translatable("config.power_networks.misc.useDoubleLeads.tooltip2"))
+                        .build())
+                .build();
+    }
+
+    private static ConfigCategory createClientCategory(ClientCategory.Mutable instance) {
+        return ConfigCategory.createBuilder()
+                .name(Text.translatable("config.power_networks.client"))
+                .option(Option.createBuilder(int.class)
+                        .name(Text.translatable("config.power_networks.client.segmentsPerBlock"))
+                        .binding(DEFAULT.client().segmentsPerBlock(), () -> instance.segmentsPerBlock, value -> instance.segmentsPerBlock = value)
+                        .controller(IntegerFieldController::new)
+                        .tooltip(Text.translatable("config.power_networks.client.segmentsPerBlock.tooltip"))
+                        .build())
+                .option(Option.createBuilder(float.class)
+                        .name(Text.translatable("config.power_networks.client.wireWidth"))
+                        .binding(DEFAULT.client().wireWidth(), () -> instance.wireWidth, value -> instance.wireWidth = value)
+                        .controller(FloatFieldController::new)
+                        .build())
+                .option(Option.createBuilder(float.class)
+                        .name(Text.translatable("config.power_networks.client.hangFactor"))
+                        .binding(DEFAULT.client().hangFactor(), () -> instance.hangFactor, value -> instance.hangFactor = value)
+                        .controller(FloatFieldController::new)
+                        .tooltip(Text.translatable("config.power_networks.client.hangFactor.tooltip"))
+                        .build())
+                .option(ListOption.createBuilder(Color.class)
+                        .initial(Color.BLACK)
+                        .name(Text.translatable("config.power_networks.client.colors"))
+                        .binding(DEFAULT.client().colors().stream().map(Color::new).toList(),
+                                () -> instance.colors.stream().map(Color::new).toList(),
+                                value -> instance.colors = value.stream().map(Color::getRGB).map(color -> color & 0x00ffffff).toList())
+                        .controller(ColorController::new)
+                        .tooltip(Text.translatable("config.power_networks.client.colors.tooltip"))
+                        .collapsed(true)
                         .build())
                 .build();
     }

@@ -2,7 +2,6 @@ package io.github.mattidragon.powernetworks.network;
 
 import com.kneelawk.graphlib.GraphLib;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
-import io.github.mattidragon.powernetworks.misc.CoilTier;
 import net.minecraft.registry.Registry;
 
 import java.util.List;

@@ -10,5 +10,6 @@ public class PowerNetworksDatagen implements DataGeneratorEntrypoint {
 		pack.addProvider(ReadmeDataProvider::new);
 		pack.addProvider(BlockLootTableProvider::new);
 		pack.addProvider(RecipeProvider::new);
+		pack.addProvider(ModelProvider::new);
 	}
 }

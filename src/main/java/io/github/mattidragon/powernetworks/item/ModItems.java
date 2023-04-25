@@ -1,12 +1,8 @@
 package io.github.mattidragon.powernetworks.item;
 
-import eu.pb4.polymer.core.api.item.PolymerBlockItem;
 import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.block.ModBlocks;
-import io.github.mattidragon.powernetworks.misc.CoilTier;
-import io.github.mattidragon.powernetworks.virtual.HeadElement;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 
