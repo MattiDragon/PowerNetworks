@@ -29,7 +29,6 @@ import java.util.Set;
 
 public class CoilBlockEntity extends BlockEntity {
     public CoilDisplay display;
-    private final CoilTier tier;
     private CoilTransferMode transferMode = CoilTransferMode.DEFAULT;
     private final Set<BlockPos> connections = new HashSet<>();
     public final CoilEnergyStorage storage;
@@ -45,7 +44,7 @@ public class CoilBlockEntity extends BlockEntity {
 
     public CoilBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlocks.COIL_BLOCK_ENTITY, pos, state);
-        tier = CoilTier.ofBlock(state.getBlock());
+        var tier = CoilTier.ofBlock(state.getBlock());
         storage = new CoilEnergyStorage(tier.getTransferRate(), transferMode, this::markDirty);
     }
 

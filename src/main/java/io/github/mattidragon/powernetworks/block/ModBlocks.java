@@ -1,5 +1,6 @@
 package io.github.mattidragon.powernetworks.block;
 
+import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -31,5 +32,6 @@ public class ModBlocks {
         Registry.register(Registries.BLOCK, PowerNetworks.id("ultimate_coil"), ULTIMATE_COIL);
 
         Registry.register(Registries.BLOCK_ENTITY_TYPE, PowerNetworks.id("coil"), COIL_BLOCK_ENTITY);
+        PolymerBlockUtils.registerBlockEntity(COIL_BLOCK_ENTITY);
     }
 }

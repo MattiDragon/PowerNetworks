@@ -22,6 +22,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -63,7 +64,7 @@ public class CoilBlock extends RodBlock implements PolymerBlock, PolymerClientDe
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
-        tooltip.add(Text.translatable("block.power_networks.coil.buffer_size", tier.getTransferRate()));
+        tooltip.add(Text.translatable("block.power_networks.coil.buffer_size", Text.literal(String.valueOf(tier.getTransferRate())).formatted(Formatting.YELLOW)).formatted(Formatting.GRAY));
     }
 
     public CoilTier getTier() {
