@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "power_networks:basic_coil",
+    "power_networks:improved_coil",
+    "power_networks:advanced_coil",
+    "power_networks:ultimate_coil"
+  ]
+}
