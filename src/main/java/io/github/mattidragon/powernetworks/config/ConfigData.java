@@ -9,7 +9,6 @@ import io.github.mattidragon.powernetworks.config.category.TexturesCategory;
 import io.github.mattidragon.powernetworks.config.category.TransferRatesCategory;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public record ConfigData(TransferRatesCategory transferRates, TexturesCategory textures, MiscCategory misc, ClientCategory client) {
