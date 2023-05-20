@@ -3,6 +3,8 @@ package io.github.mattidragon.powernetworks.config.category;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import static io.github.mattidragon.powernetworks.config.ConfigData.defaultingFieldOf;
+
 public record TexturesCategory(String basicCoil, String improvedCoil, String advancedCoil, String ultimateCoil,
                                String inputIndicator, String outputIndicator, String wire) {
     public static final TexturesCategory DEFAULT = new TexturesCategory(
@@ -15,13 +17,13 @@ public record TexturesCategory(String basicCoil, String improvedCoil, String adv
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2VhYTQ5MmVmODA2NWQxMGM0M2M3ZTUzNGM0ZjcyMjk4Y2U0OTI3MzA0YmNjNmE4MDMxYTg5ZWE5OTcyNWEyNGQifX19");
 
     public static final Codec<TexturesCategory> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("basicCoil").setPartial(DEFAULT::basicCoil).forGetter(TexturesCategory::basicCoil),
-            Codec.STRING.fieldOf("improvedCoil").setPartial(DEFAULT::improvedCoil).forGetter(TexturesCategory::improvedCoil),
-            Codec.STRING.fieldOf("advancedCoil").setPartial(DEFAULT::advancedCoil).forGetter(TexturesCategory::advancedCoil),
-            Codec.STRING.fieldOf("ultimateCoil").setPartial(DEFAULT::ultimateCoil).forGetter(TexturesCategory::ultimateCoil),
-            Codec.STRING.fieldOf("inputIndicator").setPartial(DEFAULT::inputIndicator).forGetter(TexturesCategory::inputIndicator),
-            Codec.STRING.fieldOf("outputIndicator").setPartial(DEFAULT::outputIndicator).forGetter(TexturesCategory::outputIndicator),
-            Codec.STRING.fieldOf("wire").setPartial(DEFAULT::wire).forGetter(TexturesCategory::wire)
+            defaultingFieldOf(Codec.STRING, "basicCoil", DEFAULT.basicCoil).forGetter(TexturesCategory::basicCoil),
+            defaultingFieldOf(Codec.STRING, "improvedCoil", DEFAULT.improvedCoil).forGetter(TexturesCategory::improvedCoil),
+            defaultingFieldOf(Codec.STRING, "advancedCoil", DEFAULT.advancedCoil).forGetter(TexturesCategory::advancedCoil),
+            defaultingFieldOf(Codec.STRING, "ultimateCoil", DEFAULT.ultimateCoil).forGetter(TexturesCategory::ultimateCoil),
+            defaultingFieldOf(Codec.STRING, "inputIndicator", DEFAULT.inputIndicator).forGetter(TexturesCategory::inputIndicator),
+            defaultingFieldOf(Codec.STRING, "outputIndicator", DEFAULT.outputIndicator).forGetter(TexturesCategory::outputIndicator),
+            defaultingFieldOf(Codec.STRING, "wire", DEFAULT.wire).forGetter(TexturesCategory::wire)
     ).apply(instance, TexturesCategory::new));
 
     public Mutable toMutable() {

@@ -5,14 +5,16 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.List;
 
+import static io.github.mattidragon.powernetworks.config.ConfigData.defaultingFieldOf;
+
 public record ClientCategory(int segmentsPerBlock, float wireWidth, float hangFactor, List<Integer> colors) {
     public static final ClientCategory DEFAULT = new ClientCategory(8, 0.05f, 1.5f, List.of(0x884832, 0xD07D59));
 
     public static final Codec<ClientCategory> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("segmentsPerBlock").setPartial(DEFAULT::segmentsPerBlock).forGetter(ClientCategory::segmentsPerBlock),
-            Codec.FLOAT.fieldOf("wireWidth").setPartial(DEFAULT::wireWidth).forGetter(ClientCategory::wireWidth),
-            Codec.FLOAT.fieldOf("hangFactor").setPartial(DEFAULT::hangFactor).forGetter(ClientCategory::hangFactor),
-            Codec.INT.listOf().fieldOf("colors").setPartial(DEFAULT::colors).forGetter(ClientCategory::colors)
+            defaultingFieldOf(Codec.INT, "segmentsPerBlock", DEFAULT.segmentsPerBlock).forGetter(ClientCategory::segmentsPerBlock),
+            defaultingFieldOf(Codec.FLOAT, "wireWidth", DEFAULT.wireWidth).forGetter(ClientCategory::wireWidth),
+            defaultingFieldOf(Codec.FLOAT, "hangFactor", DEFAULT.hangFactor).forGetter(ClientCategory::hangFactor),
+            defaultingFieldOf(Codec.INT.listOf(), "colors", DEFAULT.colors).forGetter(ClientCategory::colors)
     ).apply(instance, ClientCategory::new));
 
     public Mutable toMutable() {

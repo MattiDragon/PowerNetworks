@@ -3,17 +3,20 @@ package io.github.mattidragon.powernetworks.config.category;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mattidragon.powernetworks.config.ConfigData;
 
 import java.util.function.Function;
+
+import static io.github.mattidragon.powernetworks.config.ConfigData.defaultingFieldOf;
 
 public record TransferRatesCategory(long basic, long improved, long advanced, long ultimate) {
     public static final TransferRatesCategory DEFAULT = new TransferRatesCategory(256, 1024, 4096, 16384);
 
     public static final Codec<TransferRatesCategory> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            transferRateCodec().fieldOf("basic").setPartial(DEFAULT::basic).forGetter(TransferRatesCategory::basic),
-            transferRateCodec().fieldOf("improved").setPartial(DEFAULT::improved).forGetter(TransferRatesCategory::improved),
-            transferRateCodec().fieldOf("advanced").setPartial(DEFAULT::advanced).forGetter(TransferRatesCategory::advanced),
-            transferRateCodec().fieldOf("ultimate").setPartial(DEFAULT::ultimate).forGetter(TransferRatesCategory::ultimate)
+            defaultingFieldOf(transferRateCodec(), "basic", DEFAULT.basic).forGetter(TransferRatesCategory::basic),
+            defaultingFieldOf(transferRateCodec(), "improved", DEFAULT.improved).forGetter(TransferRatesCategory::improved),
+            defaultingFieldOf(transferRateCodec(), "advanced", DEFAULT.advanced).forGetter(TransferRatesCategory::advanced),
+            defaultingFieldOf(transferRateCodec(), "ultimate", DEFAULT.ultimate).forGetter(TransferRatesCategory::ultimate)
     ).apply(instance, TransferRatesCategory::new));
 
     private static Codec<Long> transferRateCodec() {
