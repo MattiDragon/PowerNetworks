@@ -1,6 +1,7 @@
 package io.github.mattidragon.powernetworks.block;
 
 import com.kneelawk.graphlib.GraphLib;
+import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.misc.CoilEnergyStorage;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
 import io.github.mattidragon.powernetworks.misc.CoilTransferMode;
@@ -80,12 +81,15 @@ public class CoilBlockEntity extends BlockEntity {
             return;
 
         for (var connection : connections) {
-            var coil2 = CoilBlock.getBlockEntity(serverWorld, connection);
-            if (coil2 == null)
+            var coil = CoilBlock.getBlockEntity(serverWorld, connection);
+            if (coil == null) continue;
+            if (coil == this) {
+                PowerNetworks.LOGGER.warn("Coil at {} was connected to itself", pos.toShortString());
                 continue;
-            coil2.connections.remove(pos);
-            GraphLib.getController(serverWorld).updateConnections(coil2.pos);
-            world.updateListeners(coil2.pos, coil2.getCachedState(), coil2.getCachedState(), Block.NOTIFY_ALL);
+            }
+            coil.connections.remove(pos);
+            GraphLib.getController(serverWorld).updateConnections(coil.pos);
+            world.updateListeners(coil.pos, coil.getCachedState(), coil.getCachedState(), Block.NOTIFY_ALL);
         }
         connections.clear();
         GraphLib.getController(serverWorld).updateConnections(pos);

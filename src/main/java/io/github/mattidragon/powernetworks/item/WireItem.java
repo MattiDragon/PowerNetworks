@@ -55,7 +55,7 @@ public class WireItem extends Item implements PolymerItem {
             if (connectionNbt != null) {
                 var coil2 = CoilBlock.getBlockEntity(world, NbtHelper.toBlockPos(connectionNbt));
 
-                if (coil1 == null || coil2 == null) {
+                if (coil1 == null || coil2 == null || coil1 == coil2) {
                     stack.removeSubNbt(CONNECTION_POS_KEY);
                     return ActionResult.FAIL;
                 }
