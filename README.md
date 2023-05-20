@@ -66,3 +66,7 @@ On servers each client has to leave to get the new textures to fully apply.
 ### Misc
 The misc section of the config currently has one option to enable double lead rendering.
 Double leads can help if you are having issues with connections not rendering, but causes some z-fighting.
+
+## Porting and Forking
+You can read my policy on [forking and porting mods](https://gist.github.com/MattiDragon/6b9e71e8516447f53f0d5fb296ab8868).
+This mod will not be ported to anything older than 1.19.4 due to that version adding necessary client features.
