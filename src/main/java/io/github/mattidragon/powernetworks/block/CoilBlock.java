@@ -1,12 +1,11 @@
 package io.github.mattidragon.powernetworks.block;
 
-import com.kneelawk.graphlib.GraphLib;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import eu.pb4.polymer.networking.api.PolymerServerNetworking;
-import io.github.mattidragon.powernetworks.item.ModItems;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
+import io.github.mattidragon.powernetworks.network.NetworkRegistry;
 import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,7 +13,6 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -26,7 +24,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -112,8 +109,7 @@ public class CoilBlock extends RodBlock implements PolymerBlock, PolymerClientDe
     @Override
     public void prepare(BlockState state, WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth) {
         if (world instanceof ServerWorld serverWorld) {
-            GraphLib.getController(serverWorld).updateConnections(pos);
-            GraphLib.getController(serverWorld).updateNodes(pos);
+            NetworkRegistry.UNIVERSE.getGraphWorld(serverWorld).updateNodes(pos);
         }
     }
 
@@ -121,28 +117,11 @@ public class CoilBlock extends RodBlock implements PolymerBlock, PolymerClientDe
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         var coil = getBlockEntity(world, pos);
         if (coil != null) {
-            if (!newState.isOf(this)) {
-                dropWires(world, pos, coil);
-                coil.disconnectAllConnections();
-            }
-
             if (coil.display != null) {
                 coil.display.clear();
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
-    }
-
-    private void dropWires(World world, BlockPos pos, CoilBlockEntity coil) {
-        var itemsPerStack = ModItems.WIRE.getMaxCount();
-        var connections = coil.getConnections().size();
-        var inventory = new SimpleInventory((connections / itemsPerStack) + 1);
-        for (int slot = 0; slot < inventory.size(); slot++) {
-            var itemsToDrop = Math.min(connections, itemsPerStack);
-            connections -= itemsToDrop;
-            inventory.setStack(slot, new ItemStack(ModItems.WIRE, itemsToDrop));
-        }
-        ItemScatterer.spawn(world, pos, inventory);
     }
 
     @SuppressWarnings("unchecked")

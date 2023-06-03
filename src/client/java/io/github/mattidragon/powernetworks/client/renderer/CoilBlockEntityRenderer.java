@@ -25,7 +25,7 @@ public class CoilBlockEntityRenderer implements BlockEntityRenderer<CoilBlockEnt
         if (world == null) return;
         world.getBlockState(coil.getPos());
 
-        var connections = coil.getConnections()
+        var connections = coil.getClientConnectionCache()
                 .stream()
                 .filter(pos -> pos.asLong() < coil.getPos().asLong()) // Only one coil may render a connection, which one doesn't matter
                 .toList();
@@ -41,7 +41,7 @@ public class CoilBlockEntityRenderer implements BlockEntityRenderer<CoilBlockEnt
         matrices.pop();
     }
 
-    private void drawConnection(BlockPos fromPos, BlockPos toPos, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int fromLight, int toLight) {
+    private static void drawConnection(BlockPos fromPos, BlockPos toPos, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int fromLight, int toLight) {
         var offset = new Vector3f(toPos.getX() - fromPos.getX(), toPos.getY() - fromPos.getY(), toPos.getZ() - fromPos.getZ());
         var segments = (int) offset.length() * PowerNetworksConfig.get().client().segmentsPerBlock();
         var segmentOffset = offset.div(segments, new Vector3f());
@@ -68,7 +68,7 @@ public class CoilBlockEntityRenderer implements BlockEntityRenderer<CoilBlockEnt
 
     }
 
-    private void drawSegment(Vector3f from, Vector3f to, MatrixStack matrices, VertexConsumer vertexConsumer, int light, int index, boolean isFirstPass) {
+    private static void drawSegment(Vector3f from, Vector3f to, MatrixStack matrices, VertexConsumer vertexConsumer, int light, int index, boolean isFirstPass) {
         var direction = to.sub(from, new Vector3f()).normalize();
         var angle = (float) Math.acos(new Vector3f(0, 1, 0).dot(direction));
 
@@ -94,7 +94,7 @@ public class CoilBlockEntityRenderer implements BlockEntityRenderer<CoilBlockEnt
         matrices.pop();
     }
 
-    private float getHeightModifier(float progress, float height, float length) {
+    private static float getHeightModifier(float progress, float height, float length) {
         var a = height * progress * progress;
         var b = height - height * (1f - progress) * (1f - progress);
         var x = length * progress;
@@ -104,7 +104,7 @@ public class CoilBlockEntityRenderer implements BlockEntityRenderer<CoilBlockEnt
         return height > 0 ? a + c : b + c;
     }
 
-    private int getColor(int segmentIndex) {
+    private static int getColor(int segmentIndex) {
         var colors = PowerNetworksConfig.get().client().colors();
         if (colors.size() == 0)
             return 0xffff00ff;

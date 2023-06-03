@@ -1,11 +1,14 @@
 package io.github.mattidragon.powernetworks.block;
 
-import com.kneelawk.graphlib.GraphLib;
-import io.github.mattidragon.powernetworks.PowerNetworks;
+import com.kneelawk.graphlib.api.graph.NodeHolder;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.kneelawk.graphlib.api.util.NodePos;
 import io.github.mattidragon.powernetworks.misc.CoilEnergyStorage;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
 import io.github.mattidragon.powernetworks.misc.CoilTransferMode;
-import io.github.mattidragon.powernetworks.network.NetworkUpdateHandler;
+import io.github.mattidragon.powernetworks.network.CoilNode;
+import io.github.mattidragon.powernetworks.network.NetworkRegistry;
+import io.github.mattidragon.powernetworks.network.WireLinkKey;
 import io.github.mattidragon.powernetworks.virtual.CoilDisplay;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,8 +34,9 @@ import java.util.Set;
 public class CoilBlockEntity extends BlockEntity {
     public CoilDisplay display;
     private CoilTransferMode transferMode = CoilTransferMode.DEFAULT;
-    private final Set<BlockPos> connections = new HashSet<>();
     public final CoilEnergyStorage storage;
+
+    private final Set<BlockPos> clientConnectionCache = new HashSet<>();
 
     static {
         EnergyStorage.SIDED.registerForBlockEntity((coil, direction) -> {
@@ -50,10 +54,9 @@ public class CoilBlockEntity extends BlockEntity {
     }
 
     public static void connect(ServerWorld world, CoilBlockEntity first, CoilBlockEntity second) {
-        first.connections.add(second.pos);
-        second.connections.add(first.pos);
-        GraphLib.getController(world).updateConnections(first.pos);
-        GraphLib.getController(world).updateConnections(second.pos);
+        var graphWorld = NetworkRegistry.UNIVERSE.getGraphWorld(world);
+        graphWorld.connectNodes(new NodePos(first.pos, CoilNode.INSTANCE), new NodePos(second.pos, CoilNode.INSTANCE), WireLinkKey.INSTANCE);
+
         world.updateListeners(first.pos, first.getCachedState(), first.getCachedState(), 0);
         world.updateListeners(second.pos, second.getCachedState(), second.getCachedState(), 0);
     }
@@ -64,7 +67,6 @@ public class CoilBlockEntity extends BlockEntity {
 
         coil.display.tick();
         coil.pushEnergy();
-        NetworkUpdateHandler.onTick(coil);
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -80,24 +82,27 @@ public class CoilBlockEntity extends BlockEntity {
         if (!(world instanceof ServerWorld serverWorld))
             return;
 
-        for (var connection : connections) {
-            var coil = CoilBlock.getBlockEntity(serverWorld, connection);
-            if (coil == null) continue;
-            if (coil == this) {
-                PowerNetworks.LOGGER.warn("Coil at {} was connected to itself", pos.toShortString());
-                continue;
-            }
-            coil.connections.remove(pos);
-            GraphLib.getController(serverWorld).updateConnections(coil.pos);
-            world.updateListeners(coil.pos, coil.getCachedState(), coil.getCachedState(), Block.NOTIFY_ALL);
+        var graphWorld = NetworkRegistry.UNIVERSE.getGraphWorld(serverWorld);
+        var node = graphWorld.getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
+        if (node == null)
+            return;
+
+        for (var connection : node.getConnections()) {
+            NodeHolder<BlockNode> other = connection.other(node);
+            graphWorld.disconnectNodes(node.toNodePos(), other.toNodePos(), WireLinkKey.INSTANCE);
+            var state = world.getBlockState(other.getPos());
+            world.updateListeners(other.getPos(), state, state, Block.NOTIFY_ALL);
         }
-        connections.clear();
-        GraphLib.getController(serverWorld).updateConnections(pos);
         world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_ALL);
     }
 
-    public Set<BlockPos> getConnections() {
-        return Collections.unmodifiableSet(connections);
+    public Set<BlockPos> getClientConnectionCache() {
+        return Collections.unmodifiableSet(clientConnectionCache);
+    }
+
+    public void setClientConnectionCache(Set<BlockPos> clientConnectionCache) {
+        this.clientConnectionCache.clear();
+        this.clientConnectionCache.addAll(clientConnectionCache);
     }
 
     public void cycleTransferMode() {
@@ -124,11 +129,16 @@ public class CoilBlockEntity extends BlockEntity {
     @Override
     public NbtCompound toInitialChunkDataNbt() {
         var nbt = super.toInitialChunkDataNbt();
+        if (!(world instanceof ServerWorld serverWorld)) return nbt;
+
+        var node = NetworkRegistry.UNIVERSE.getGraphWorld(serverWorld).getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
+        if (node == null) return nbt;
+
         var list = new NbtList();
-        for (var connection : connections) {
-            list.add(NbtHelper.fromBlockPos(connection));
+        for (var connection : node.getConnections()) {
+            list.add(NbtHelper.fromBlockPos(connection.other(node).getPos()));
         }
-        nbt.put("connections", list);
+        nbt.put("clientConnectionCache", list);
         return nbt;
     }
 
@@ -141,9 +151,11 @@ public class CoilBlockEntity extends BlockEntity {
 
     @Override
     public void readNbt(NbtCompound nbt) {
-        connections.clear();
-        for (var element : nbt.getList("connections", NbtElement.COMPOUND_TYPE)) {
-            connections.add(NbtHelper.toBlockPos((NbtCompound) element));
+        if (nbt.contains("clientConnectionCache", NbtElement.LIST_TYPE)) {
+            clientConnectionCache.clear();
+            for (var element : nbt.getList("clientConnectionCache", NbtElement.COMPOUND_TYPE)) {
+                clientConnectionCache.add(NbtHelper.toBlockPos((NbtCompound) element));
+            }
         }
 
         storage.inputBuffer.amount = nbt.getLong("inputEnergyBuffer");
@@ -154,12 +166,6 @@ public class CoilBlockEntity extends BlockEntity {
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        var list = new NbtList();
-        for (var connection : connections) {
-            list.add(NbtHelper.fromBlockPos(connection));
-        }
-        nbt.put("connections", list);
-
         nbt.putLong("inputEnergyBuffer", storage.inputBuffer.amount);
         nbt.putLong("outputEnergyBuffer", storage.outputBuffer.amount);
         nbt.putByte("transferMode", (byte) transferMode.ordinal());

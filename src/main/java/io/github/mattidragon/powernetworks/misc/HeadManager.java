@@ -42,7 +42,7 @@ public class HeadManager {
         setTexture(WIRE_ITEM_PROFILE, textures.wire());
     }
 
-    private static void setTexture(GameProfile profile, String texture) {
+    public static void setTexture(GameProfile profile, String texture) {
         profile.getProperties().removeAll("textures");
         profile.getProperties().put("textures", new Property("Value", texture));
     }

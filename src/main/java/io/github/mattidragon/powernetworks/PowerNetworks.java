@@ -8,6 +8,7 @@ import io.github.mattidragon.powernetworks.network.NetworkRegistry;
 import io.github.mattidragon.powernetworks.network.NetworkUpdateHandler;
 import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -25,21 +26,23 @@ public class PowerNetworks implements ModInitializer {
 	public void onInitialize() {
 		// Force load config to stay more reliable
 		PowerNetworksConfig.get();
-		NetworkUpdateHandler.register();
 		NetworkRegistry.register();
 		ModBlocks.register();
 		ModItems.register();
 		PowerNetworksNetworking.register();
 
-		PolymerItemGroupUtils.builder(id("content")).displayName(Text.translatable("itemGroup.power_networks.content"))
-				.icon(ModItems.ADVANCED_COIL::getDefaultStack)
-				.entries((displayContext, entries) -> {
-					entries.add(ModItems.WIRE);
-					entries.add(ModItems.BASIC_COIL);
-					entries.add(ModItems.IMPROVED_COIL);
-					entries.add(ModItems.ADVANCED_COIL);
-					entries.add(ModItems.ULTIMATE_COIL);
-				})
-				.build();
+		PolymerItemGroupUtils.registerPolymerItemGroup(id("content"),
+				FabricItemGroup.builder()
+						.displayName(Text.translatable("itemGroup.power_networks.content"))
+						.icon(ModItems.ADVANCED_COIL::getDefaultStack)
+						.entries((displayContext, entries) -> {
+							entries.add(ModItems.WIRE);
+							entries.add(ModItems.BASIC_COIL);
+							entries.add(ModItems.IMPROVED_COIL);
+							entries.add(ModItems.ADVANCED_COIL);
+							entries.add(ModItems.ULTIMATE_COIL);
+						})
+						.build());
+
 	}
 }

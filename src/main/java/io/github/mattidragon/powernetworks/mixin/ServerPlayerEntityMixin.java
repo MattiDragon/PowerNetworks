@@ -33,7 +33,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         if (posNbt == null) return;
 
         var pos = NbtHelper.toBlockPos(posNbt);
-        var coil = CoilBlock.getBlockEntity(this.world, pos);
+        var coil = CoilBlock.getBlockEntity(this.getWorld(), pos);
         if (coil == null) return;
 
         coil.display.attachPlayerLeash((ServerPlayerEntity) (Object) this);

@@ -1,12 +1,14 @@
 package io.github.mattidragon.powernetworks.virtual;
 
-import com.kneelawk.graphlib.GraphLib;
+import com.kneelawk.graphlib.api.util.NodePos;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
 import io.github.mattidragon.powernetworks.config.PowerNetworksConfig;
 import io.github.mattidragon.powernetworks.item.WireItem;
 import io.github.mattidragon.powernetworks.misc.CoilTransferMode;
+import io.github.mattidragon.powernetworks.network.CoilNode;
+import io.github.mattidragon.powernetworks.network.NetworkRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -68,34 +70,35 @@ public class CoilDisplay {
         if (!(this.world instanceof ServerWorld serverWorld))
             return;
 
-        var controller = GraphLib.getController(serverWorld);
-        var node = controller.getNodesAt(pos).findFirst();
+        var graphWorld = NetworkRegistry.UNIVERSE.getGraphWorld(serverWorld);
+        var node = graphWorld.getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
+        if (node == null)
+            return;
 
-        if (node.isPresent()) {
-            var useDoubleLeads = PowerNetworksConfig.get().misc().useDoubleLeads();
-            var removedConnections = new HashSet<>(connectionElements.keySet());
-            for (var link : node.get().connections()) {
-                if (!useDoubleLeads) {
-                    // If y positions are different we use the bottom one for target
-                    var pos2 = link.other(node.get()).data().getPos();
-                    if (pos.getY() < pos2.getY() || pos.getY() == pos2.getY() && node.get() == link.first()) continue;
-                }
-
-                var otherPos = link.other(node.get()).data().getPos();
-                removedConnections.remove(otherPos);
-                if (!connectionElements.containsKey(otherPos)) {
-                    var coil2 = CoilBlock.getBlockEntity(serverWorld, otherPos);
-                    if (coil2 == null || coil2.display == null)
-                        continue;
-                    var sourceElement = new LeashSourceElement(coil2.display.leashTarget.getEntityIds().getInt(0), false);
-                    holder.addElement(sourceElement);
-                    connectionElements.put(otherPos, sourceElement);
-                }
+        var useDoubleLeads = PowerNetworksConfig.get().misc().useDoubleLeads();
+        var removedConnections = new HashSet<>(connectionElements.keySet());
+        for (var link : node.getConnections()) {
+            if (!useDoubleLeads) {
+                // If y positions are different we use the bottom one for target
+                var pos2 = link.other(node).getPos();
+                if (pos.getY() < pos2.getY()) continue;
+                if (pos.getY() == pos2.getY() && pos.asLong() < pos2.asLong()) continue;
             }
 
-            for (var removed : removedConnections) {
-                holder.removeElement(connectionElements.remove(removed));
+            var otherPos = link.other(node).getPos();
+            removedConnections.remove(otherPos);
+            if (!connectionElements.containsKey(otherPos)) {
+                var coil2 = CoilBlock.getBlockEntity(serverWorld, otherPos);
+                if (coil2 == null || coil2.display == null)
+                    continue;
+                var sourceElement = new LeashSourceElement(coil2.display.leashTarget.getEntityIds().getInt(0), false);
+                holder.addElement(sourceElement);
+                connectionElements.put(otherPos, sourceElement);
             }
+        }
+
+        for (var removed : removedConnections) {
+            holder.removeElement(connectionElements.remove(removed));
         }
     }
 

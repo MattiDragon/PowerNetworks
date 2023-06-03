@@ -35,7 +35,7 @@ dependencies {
     modImplementation include("com.kneelawk:graphlib:$graphlib_version")
 
     // Config
-    modImplementation include("dev.isxander:yet-another-config-lib:$yacl_version")
+    modImplementation include("dev.isxander.yacl:yet-another-config-lib-fabric:$yacl_version")
     modImplementation "com.terraformersmc:modmenu:$modmenu_version"
 
     // Tech reborn for testing

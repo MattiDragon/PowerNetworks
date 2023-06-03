@@ -1,12 +1,7 @@
 package io.github.mattidragon.powernetworks.client.config;
 
 import dev.isxander.yacl.api.*;
-import dev.isxander.yacl.gui.controllers.ColorController;
-import dev.isxander.yacl.gui.controllers.TickBoxController;
-import dev.isxander.yacl.gui.controllers.string.StringController;
-import dev.isxander.yacl.gui.controllers.string.number.FloatFieldController;
-import dev.isxander.yacl.gui.controllers.string.number.IntegerFieldController;
-import dev.isxander.yacl.gui.controllers.string.number.LongFieldController;
+import dev.isxander.yacl.api.controller.*;
 import io.github.mattidragon.powernetworks.config.ConfigData;
 import io.github.mattidragon.powernetworks.config.category.ClientCategory;
 import io.github.mattidragon.powernetworks.config.category.MiscCategory;
@@ -14,10 +9,13 @@ import io.github.mattidragon.powernetworks.config.category.TexturesCategory;
 import io.github.mattidragon.powernetworks.config.category.TransferRatesCategory;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -40,37 +38,50 @@ public class ConfigClient {
 
         return YetAnotherConfigLib.createBuilder()
                 .title(Text.translatable("config.power_networks"))
-                .category(createTransferRatesCategory(transferRates))
                 .category(createTexturesCategory(textures))
-                .category(createMiscCategory(misc))
+                .category(createMiscCategory(misc, transferRates))
                 .category(createClientCategory(client))
                 .save(() -> saveConsumer.accept(new ConfigData(transferRates.toImmutable(), textures.toImmutable(), misc.toImmutable(), client.toImmutable())))
                 .build()
                 .generateScreen(parent);
     }
 
-    private static ConfigCategory createTransferRatesCategory(TransferRatesCategory.Mutable instance) {
+    private static ConfigCategory createMiscCategory(MiscCategory.Mutable misc, TransferRatesCategory.Mutable transferRates) {
         return ConfigCategory.createBuilder()
-                .name(Text.translatable("config.power_networks.transfer_rates"))
-                .option(Option.createBuilder(long.class)
-                        .name(Text.translatable("config.power_networks.transfer_rates.basic"))
-                        .binding(DEFAULT.transferRates().basic(), () -> instance.basic, value -> instance.basic = value)
-                        .controller(option -> new LongFieldController(option, 1, Long.MAX_VALUE))
+                .name(Text.translatable("config.power_networks.misc"))
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.translatable("config.power_networks.misc.useDoubleLeads"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.misc.useDoubleLeads.description")))
+                        .binding(DEFAULT.misc().useDoubleLeads(), () -> misc.useDoubleLeads, value -> misc.useDoubleLeads = value)
+                        .controller(TickBoxControllerBuilder::create)
                         .build())
-                .option(Option.createBuilder(long.class)
-                        .name(Text.translatable("config.power_networks.transfer_rates.improved"))
-                        .binding(DEFAULT.transferRates().improved(), () -> instance.improved, value -> instance.improved = value)
-                        .controller(option -> new LongFieldController(option, 1, Long.MAX_VALUE))
-                        .build())
-                .option(Option.createBuilder(long.class)
-                        .name(Text.translatable("config.power_networks.transfer_rates.advanced"))
-                        .binding(DEFAULT.transferRates().advanced(), () -> instance.advanced, value -> instance.advanced = value)
-                        .controller(option -> new LongFieldController(option, 1, Long.MAX_VALUE))
-                        .build())
-                .option(Option.createBuilder(long.class)
-                        .name(Text.translatable("config.power_networks.transfer_rates.ultimate"))
-                        .binding(DEFAULT.transferRates().ultimate(), () -> instance.ultimate, value -> instance.ultimate = value)
-                        .controller(option -> new LongFieldController(option, 1, Long.MAX_VALUE))
+                .group(OptionGroup.createBuilder()
+                        .name(Text.translatable("config.power_networks.transfer_rates"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.description")))
+                        .option(Option.<Long>createBuilder()
+                                .name(Text.translatable("config.power_networks.transfer_rates.basic"))
+                                .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.basic.description")))
+                                .binding(DEFAULT.transferRates().basic(), () -> transferRates.basic, value -> transferRates.basic = value)
+                                .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                                .build())
+                        .option(Option.<Long>createBuilder()
+                                .name(Text.translatable("config.power_networks.transfer_rates.improved"))
+                                .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.improved.description")))
+                                .binding(DEFAULT.transferRates().improved(), () -> transferRates.improved, value -> transferRates.improved = value)
+                                .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                                .build())
+                        .option(Option.<Long>createBuilder()
+                                .name(Text.translatable("config.power_networks.transfer_rates.advanced"))
+                                .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.advanced.description")))
+                                .binding(DEFAULT.transferRates().advanced(), () -> transferRates.advanced, value -> transferRates.advanced = value)
+                                .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                                .build())
+                        .option(Option.<Long>createBuilder()
+                                .name(Text.translatable("config.power_networks.transfer_rates.ultimate"))
+                                .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.ultimate.description")))
+                                .binding(DEFAULT.transferRates().ultimate(), () -> transferRates.ultimate, value -> transferRates.ultimate = value)
+                                .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                                .build())
                         .build())
                 .build();
     }
@@ -80,95 +91,101 @@ public class ConfigClient {
                 .name(Text.translatable("config.power_networks.textures"))
                 .group(OptionGroup.createBuilder()
                         .name(Text.translatable("config.power_networks.textures.coils"))
-                        .option(Option.createBuilder(String.class)
+                        .description(createTextureDescription(null, Text.translatable("config.power_networks.textures.coils.description")))
+                        .option(Option.<String>createBuilder()
                                 .name(Text.translatable("config.power_networks.textures.basicCoil"))
+                                .description(option -> createTextureDescription(option, Text.translatable("config.power_networks.textures.coils.description")))
                                 .binding(DEFAULT.textures().basicCoil(), () -> instance.basicCoil, value -> instance.basicCoil = value)
-                                .controller(StringController::new)
+                                .controller(StringControllerBuilder::create)
                                 .flag(RequireDisconnectScreen.FLAG)
                                 .build())
-                        .option(Option.createBuilder(String.class)
+                        .option(Option.<String>createBuilder()
                                 .name(Text.translatable("config.power_networks.textures.improvedCoil"))
+                                .description(option -> createTextureDescription(option, Text.translatable("config.power_networks.textures.coils.description")))
                                 .binding(DEFAULT.textures().improvedCoil(), () -> instance.improvedCoil, value -> instance.improvedCoil = value)
-                                .controller(StringController::new)
+                                .controller(StringControllerBuilder::create)
                                 .flag(RequireDisconnectScreen.FLAG)
                                 .build())
-                        .option(Option.createBuilder(String.class)
+                        .option(Option.<String>createBuilder()
                                 .name(Text.translatable("config.power_networks.textures.advancedCoil"))
+                                .description(option -> createTextureDescription(option, Text.translatable("config.power_networks.textures.coils.description")))
                                 .binding(DEFAULT.textures().advancedCoil(), () -> instance.advancedCoil, value -> instance.advancedCoil = value)
-                                .controller(StringController::new)
+                                .controller(StringControllerBuilder::create)
                                 .flag(RequireDisconnectScreen.FLAG)
                                 .build())
-                        .option(Option.createBuilder(String.class)
+                        .option(Option.<String>createBuilder()
                                 .name(Text.translatable("config.power_networks.textures.ultimateCoil"))
+                                .description(option -> createTextureDescription(option, Text.translatable("config.power_networks.textures.coils.description")))
                                 .binding(DEFAULT.textures().ultimateCoil(), () -> instance.ultimateCoil, value -> instance.ultimateCoil = value)
-                                .controller(StringController::new)
+                                .controller(StringControllerBuilder::create)
                                 .flag(RequireDisconnectScreen.FLAG)
                                 .build())
                         .build())
                 .group(OptionGroup.createBuilder()
                         .name(Text.translatable("config.power_networks.textures.indicators"))
-                        .option(Option.createBuilder(String.class)
+                        .description(createTextureDescription(null, Text.translatable("config.power_networks.textures.indicators.description")))
+                        .option(Option.<String>createBuilder()
                                 .name(Text.translatable("config.power_networks.textures.inputIndicator"))
+                                .description(option -> createTextureDescription(option, Text.translatable("config.power_networks.textures.indicators.description")))
                                 .binding(DEFAULT.textures().inputIndicator(), () -> instance.inputIndicator, value -> instance.inputIndicator = value)
-                                .controller(StringController::new)
+                                .controller(StringControllerBuilder::create)
                                 .flag(RequireDisconnectScreen.FLAG)
                                 .build())
-                        .option(Option.createBuilder(String.class)
+                        .option(Option.<String>createBuilder()
                                 .name(Text.translatable("config.power_networks.textures.outputIndicator"))
+                                .description(option -> createTextureDescription(option, Text.translatable("config.power_networks.textures.indicators.description")))
                                 .binding(DEFAULT.textures().outputIndicator(), () -> instance.outputIndicator, value -> instance.outputIndicator = value)
-                                .controller(StringController::new)
+                                .controller(StringControllerBuilder::create)
                                 .flag(RequireDisconnectScreen.FLAG)
                                 .build())
                         .build())
-                .option(Option.createBuilder(String.class)
+                .option(Option.<String>createBuilder()
                         .name(Text.translatable("config.power_networks.textures.wire"))
+                        .description(option -> createTextureDescription(option, Text.translatable("config.power_networks.textures.wire.description")))
                         .binding(DEFAULT.textures().wire(), () -> instance.wire, value -> instance.wire = value)
-                        .controller(StringController::new)
+                        .controller(StringControllerBuilder::create)
                         .flag(RequireDisconnectScreen.FLAG)
                         .build())
                 .build();
     }
 
-    private static ConfigCategory createMiscCategory(MiscCategory.Mutable instance) {
-        return ConfigCategory.createBuilder()
-                .name(Text.translatable("config.power_networks.misc"))
-                .option(Option.createBuilder(boolean.class)
-                        .name(Text.translatable("config.power_networks.misc.useDoubleLeads"))
-                        .binding(DEFAULT.misc().useDoubleLeads(), () -> instance.useDoubleLeads, value -> instance.useDoubleLeads = value)
-                        .controller(TickBoxController::new)
-                        .tooltip(Text.translatable("config.power_networks.misc.useDoubleLeads.tooltip1"), Text.translatable("config.power_networks.misc.useDoubleLeads.tooltip2"))
-                        .build())
+    private static OptionDescription createTextureDescription(@Nullable String value, Text text) {
+        return OptionDescription.createBuilder()
+                .customImage(CompletableFuture.completedFuture(Optional.ofNullable(value).map(PlayerHeadImageRenderer::new)))
+                .text(text)
+                .text(Text.translatable("config.power_networks.textures.description"))
                 .build();
     }
 
     private static ConfigCategory createClientCategory(ClientCategory.Mutable instance) {
         return ConfigCategory.createBuilder()
                 .name(Text.translatable("config.power_networks.client"))
-                .option(Option.createBuilder(int.class)
+                .option(Option.<Integer>createBuilder()
                         .name(Text.translatable("config.power_networks.client.segmentsPerBlock"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.client.segmentsPerBlock.description")))
                         .binding(DEFAULT.client().segmentsPerBlock(), () -> instance.segmentsPerBlock, value -> instance.segmentsPerBlock = value)
-                        .controller(IntegerFieldController::new)
-                        .tooltip(Text.translatable("config.power_networks.client.segmentsPerBlock.tooltip"))
+                        .controller(option -> IntegerFieldControllerBuilder.create(option).min(1))
                         .build())
-                .option(Option.createBuilder(float.class)
+                .option(Option.<Float>createBuilder()
                         .name(Text.translatable("config.power_networks.client.wireWidth"))
+                .description(OptionDescription.of(Text.translatable("config.power_networks.client.wireWidth.description")))
                         .binding(DEFAULT.client().wireWidth(), () -> instance.wireWidth, value -> instance.wireWidth = value)
-                        .controller(option1 -> new FloatFieldController(option1, 0, 1, FLOAT_FORMATTER))
+                        .controller(option -> FloatFieldControllerBuilder.create(option).range(0f, 1f).valueFormatter(FLOAT_FORMATTER))
                         .build())
-                .option(Option.createBuilder(float.class)
+                .option(Option.<Float>createBuilder()
                         .name(Text.translatable("config.power_networks.client.hangFactor"))
+                .description(OptionDescription.of(Text.translatable("config.power_networks.client.hangFactor.description")))
                         .binding(DEFAULT.client().hangFactor(), () -> instance.hangFactor, value -> instance.hangFactor = value)
-                        .controller(option -> new FloatFieldController(option, FLOAT_FORMATTER))
-                        .tooltip(Text.translatable("config.power_networks.client.hangFactor.tooltip"))
+                        .controller(option -> FloatFieldControllerBuilder.create(option).range(0f, 1f).valueFormatter(FLOAT_FORMATTER))
                         .build())
-                .group(ListOption.createBuilder(Color.class)
+                .group(ListOption.<Color>createBuilder()
                         .initial(Color.BLACK)
                         .name(Text.translatable("config.power_networks.client.colors"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.client.colors.description")))
                         .binding(DEFAULT.client().colors().stream().map(Color::new).toList(),
                                 () -> instance.colors.stream().map(Color::new).toList(),
                                 value -> instance.colors = value.stream().map(Color::getRGB).map(color -> color & 0x00ffffff).toList())
-                        .controller(ColorController::new)
-                        .tooltip(Text.translatable("config.power_networks.client.colors.tooltip"))
+                        .controller(ColorControllerBuilder::create)
                         .collapsed(true)
                         .build())
                 .build();

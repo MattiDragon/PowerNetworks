@@ -1,53 +1,38 @@
 package io.github.mattidragon.powernetworks.network;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.kneelawk.graphlib.GraphLib;
-import com.kneelawk.graphlib.graph.BlockGraph;
-import com.kneelawk.graphlib.graph.BlockNodeHolder;
-import com.kneelawk.graphlib.graph.struct.Node;
+import com.kneelawk.graphlib.api.graph.GraphEntityContext;
+import com.kneelawk.graphlib.api.graph.user.GraphEntity;
+import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
 import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
 import io.github.mattidragon.powernetworks.block.CoilBlockEntity;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class NetworkUpdateHandler {
-    private static final Multimap<RegistryKey<World>, Long> TICKED = HashMultimap.create();
+import static io.github.mattidragon.powernetworks.PowerNetworks.id;
 
-    public static void register() {
-        ServerTickEvents.END_SERVER_TICK.register(server -> TICKED.clear());
+public class NetworkUpdateHandler implements GraphEntity<NetworkUpdateHandler> {
+    public static final Identifier ID = id("update_handler");
+    private final GraphEntityContext context;
+
+    public NetworkUpdateHandler(GraphEntityContext context) {
+        this.context = context;
     }
 
-    public static void onTick(CoilBlockEntity coil) {
-        if (!(coil.getWorld() instanceof ServerWorld world))
-            return;
-
-        var controller = GraphLib.getController(world);
-
-        controller.getNodesAt(coil.getPos())
-                .map(Node::data)
-                .filter(holder -> holder.getNode() instanceof CoilNode)
-                .mapToLong(BlockNodeHolder::getGraphId)
-                .filter(id -> !TICKED.containsEntry(world.getRegistryKey(), id))
-                .mapToObj(controller::getGraph)
-                .filter(Objects::nonNull)
-                .forEach(graph -> tickGraph(world, graph));
-    }
-
+    @Override
     @SuppressWarnings("UnstableApiUsage")
-    private static void tickGraph(ServerWorld world, BlockGraph graph) {
-        TICKED.put(world.getRegistryKey(), graph.getId());
-
-        var coils = graph.getNodes()
-                .filter(node -> node.data().getNode() instanceof CoilNode)
-                .map(node -> CoilBlock.getBlockEntity(world, node.data().getPos()))
+    public void onTick() {
+        var world = context.getBlockWorld();
+        var coils = context.getGraph()
+                .getNodes()
+                .filter(node -> node.getNode() instanceof CoilNode)
+                .map(node -> CoilBlock.getBlockEntity(world, node.getPos()))
                 .filter(Objects::nonNull)
                 .toList();
 
@@ -103,9 +88,9 @@ public class NetworkUpdateHandler {
                 coilsToRemove.clear();
 
                 if (roundTotal <= 0) {
-                    PowerNetworks.LOGGER.error("Energy distribution failed: no coil is accepting energy, but still have {} left. The distribution has been canceled. Graph id: {}, Involved coils: {}",
+                    PowerNetworks.LOGGER.error("Energy distribution failed: no coil is accepting energy, but still have {} left. The distribution has been canceled. Graph: {}, Involved coils: {}",
                             movingEnergy,
-                            graph.getId(),
+                            context,
                             coils.stream().map(CoilBlockEntity::getPos).toList());
                     transaction.abort();
                     return;
@@ -113,5 +98,19 @@ public class NetworkUpdateHandler {
             }
             transaction.commit();
         }
+    }
+
+    @Override
+    public @NotNull GraphEntityType<?> getType() {
+        return NetworkRegistry.UPDATE_HANDLER;
+    }
+
+    @Override
+    public @Nullable NbtElement toTag() {
+        return null;
+    }
+
+    @Override
+    public void merge(@NotNull NetworkUpdateHandler other) {
     }
 }

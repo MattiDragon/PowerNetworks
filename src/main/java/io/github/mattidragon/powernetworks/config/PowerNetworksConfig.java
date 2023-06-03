@@ -85,7 +85,7 @@ public class PowerNetworksConfig {
                             PowerNetworks.LOGGER.error("Failed to reload config", e);
                             return 0;
                         }
-                        context.getSource().sendFeedback(Text.translatable("command.power_networks.reload.success"), true);
+                        context.getSource().sendFeedback(() -> Text.translatable("command.power_networks.reload.success"), true);
                         return 1;
                     }));
 

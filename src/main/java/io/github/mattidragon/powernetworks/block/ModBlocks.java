@@ -5,16 +5,14 @@ import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 
 public class ModBlocks {
-    private static final AbstractBlock.Settings COIL_SETTINGS = FabricBlockSettings.of(Material.METAL, MapColor.ORANGE).strength(3.0F, 6.0F).sounds(BlockSoundGroup.COPPER).nonOpaque();
+    private static final AbstractBlock.Settings COIL_SETTINGS = FabricBlockSettings.create().mapColor(MapColor.ORANGE).solid().strength(3.0F, 6.0F).sounds(BlockSoundGroup.COPPER).nonOpaque();
     public static final CoilBlock BASIC_COIL = new CoilBlock(COIL_SETTINGS, CoilTier.BASIC);
     public static final CoilBlock IMPROVED_COIL = new CoilBlock(COIL_SETTINGS, CoilTier.IMPROVED);
     public static final CoilBlock ADVANCED_COIL = new CoilBlock(COIL_SETTINGS, CoilTier.ADVANCED);
