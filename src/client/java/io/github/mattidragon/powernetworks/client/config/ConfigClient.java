@@ -3,10 +3,7 @@ package io.github.mattidragon.powernetworks.client.config;
 import dev.isxander.yacl.api.*;
 import dev.isxander.yacl.api.controller.*;
 import io.github.mattidragon.powernetworks.config.ConfigData;
-import io.github.mattidragon.powernetworks.config.category.ClientCategory;
-import io.github.mattidragon.powernetworks.config.category.MiscCategory;
-import io.github.mattidragon.powernetworks.config.category.TexturesCategory;
-import io.github.mattidragon.powernetworks.config.category.TransferRatesCategory;
+import io.github.mattidragon.powernetworks.config.category.*;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
@@ -39,14 +36,45 @@ public class ConfigClient {
         return YetAnotherConfigLib.createBuilder()
                 .title(Text.translatable("config.power_networks"))
                 .category(createTexturesCategory(textures))
-                .category(createMiscCategory(misc, transferRates))
+                .category(createTransferRatesCategory(transferRates))
+                .category(createMiscCategory(misc))
                 .category(createClientCategory(client))
                 .save(() -> saveConsumer.accept(new ConfigData(transferRates.toImmutable(), textures.toImmutable(), misc.toImmutable(), client.toImmutable())))
                 .build()
                 .generateScreen(parent);
     }
 
-    private static ConfigCategory createMiscCategory(MiscCategory.Mutable misc, TransferRatesCategory.Mutable transferRates) {
+    private static ConfigCategory createTransferRatesCategory(MutableTransferRatesCategory transferRates) {
+        return ConfigCategory.createBuilder()
+                .name(Text.translatable("config.power_networks.transfer_rates"))
+                .option(Option.<Long>createBuilder()
+                        .name(Text.translatable("config.power_networks.transfer_rates.basic"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.basic.description")))
+                        .binding(DEFAULT.transferRates().basic(), () -> transferRates.basic, value -> transferRates.basic = value)
+                        .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                        .build())
+                .option(Option.<Long>createBuilder()
+                        .name(Text.translatable("config.power_networks.transfer_rates.improved"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.improved.description")))
+                        .binding(DEFAULT.transferRates().improved(), () -> transferRates.improved, value -> transferRates.improved = value)
+                        .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                        .build())
+                .option(Option.<Long>createBuilder()
+                        .name(Text.translatable("config.power_networks.transfer_rates.advanced"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.advanced.description")))
+                        .binding(DEFAULT.transferRates().advanced(), () -> transferRates.advanced, value -> transferRates.advanced = value)
+                        .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                        .build())
+                .option(Option.<Long>createBuilder()
+                        .name(Text.translatable("config.power_networks.transfer_rates.ultimate"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.ultimate.description")))
+                        .binding(DEFAULT.transferRates().ultimate(), () -> transferRates.ultimate, value -> transferRates.ultimate = value)
+                        .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                        .build())
+                .build();
+    }
+
+    private static ConfigCategory createMiscCategory(MutableMiscCategory misc) {
         return ConfigCategory.createBuilder()
                 .name(Text.translatable("config.power_networks.misc"))
                 .option(Option.<Boolean>createBuilder()
@@ -55,38 +83,10 @@ public class ConfigClient {
                         .binding(DEFAULT.misc().useDoubleLeads(), () -> misc.useDoubleLeads, value -> misc.useDoubleLeads = value)
                         .controller(TickBoxControllerBuilder::create)
                         .build())
-                .group(OptionGroup.createBuilder()
-                        .name(Text.translatable("config.power_networks.transfer_rates"))
-                        .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.description")))
-                        .option(Option.<Long>createBuilder()
-                                .name(Text.translatable("config.power_networks.transfer_rates.basic"))
-                                .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.basic.description")))
-                                .binding(DEFAULT.transferRates().basic(), () -> transferRates.basic, value -> transferRates.basic = value)
-                                .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
-                                .build())
-                        .option(Option.<Long>createBuilder()
-                                .name(Text.translatable("config.power_networks.transfer_rates.improved"))
-                                .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.improved.description")))
-                                .binding(DEFAULT.transferRates().improved(), () -> transferRates.improved, value -> transferRates.improved = value)
-                                .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
-                                .build())
-                        .option(Option.<Long>createBuilder()
-                                .name(Text.translatable("config.power_networks.transfer_rates.advanced"))
-                                .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.advanced.description")))
-                                .binding(DEFAULT.transferRates().advanced(), () -> transferRates.advanced, value -> transferRates.advanced = value)
-                                .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
-                                .build())
-                        .option(Option.<Long>createBuilder()
-                                .name(Text.translatable("config.power_networks.transfer_rates.ultimate"))
-                                .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.ultimate.description")))
-                                .binding(DEFAULT.transferRates().ultimate(), () -> transferRates.ultimate, value -> transferRates.ultimate = value)
-                                .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
-                                .build())
-                        .build())
                 .build();
     }
 
-    private static ConfigCategory createTexturesCategory(TexturesCategory.Mutable instance) {
+    private static ConfigCategory createTexturesCategory(MutableTexturesCategory instance) {
         return ConfigCategory.createBuilder()
                 .name(Text.translatable("config.power_networks.textures"))
                 .group(OptionGroup.createBuilder()
@@ -157,7 +157,7 @@ public class ConfigClient {
                 .build();
     }
 
-    private static ConfigCategory createClientCategory(ClientCategory.Mutable instance) {
+    private static ConfigCategory createClientCategory(MutableClientCategory instance) {
         return ConfigCategory.createBuilder()
                 .name(Text.translatable("config.power_networks.client"))
                 .option(Option.<Integer>createBuilder()

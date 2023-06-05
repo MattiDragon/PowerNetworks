@@ -3,8 +3,8 @@ package io.github.mattidragon.powernetworks.virtual;
 import com.kneelawk.graphlib.api.util.NodePos;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
+import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
-import io.github.mattidragon.powernetworks.config.PowerNetworksConfig;
 import io.github.mattidragon.powernetworks.item.WireItem;
 import io.github.mattidragon.powernetworks.misc.CoilTransferMode;
 import io.github.mattidragon.powernetworks.network.CoilNode;
@@ -75,7 +75,7 @@ public class CoilDisplay {
         if (node == null)
             return;
 
-        var useDoubleLeads = PowerNetworksConfig.get().misc().useDoubleLeads();
+        var useDoubleLeads = PowerNetworks.CONFIG.get().misc().useDoubleLeads();
         var removedConnections = new HashSet<>(connectionElements.keySet());
         for (var link : node.getConnections()) {
             if (!useDoubleLeads) {

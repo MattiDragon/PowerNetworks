@@ -2,7 +2,6 @@ package io.github.mattidragon.powernetworks.networking;
 
 import eu.pb4.polymer.networking.api.PolymerServerNetworking;
 import io.github.mattidragon.powernetworks.PowerNetworks;
-import io.github.mattidragon.powernetworks.config.PowerNetworksConfig;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -17,11 +16,11 @@ public class PowerNetworksNetworking {
         PolymerServerNetworking.registerSendPacket(CLIENT_EDITING, 0);
 
         ServerPlayNetworking.registerGlobalReceiver(ConfigEditPackets.ApplyChangesPacket.TYPE, (packet, player, responseSender) -> {
-            if (!player.hasPermissionLevel(2) || !PowerNetworksConfig.get().misc().allowRemoteEdits()) {
+            if (!player.hasPermissionLevel(2) || !PowerNetworks.CONFIG.get().misc().allowRemoteEdits()) {
                 player.sendMessage(Text.translatable("power_networks.config_edit.denied").formatted(Formatting.RED));
                 return;
             }
-            PowerNetworksConfig.set(packet.config());
+            PowerNetworks.CONFIG.set(packet.config());
             player.sendMessage(Text.translatable("power_networks.config_edit.applied").formatted(Formatting.GREEN));
         });
     }

@@ -2,40 +2,26 @@ package io.github.mattidragon.powernetworks.config.category;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.mattidragon.configloader.api.DefaultedFieldCodec;
+import io.github.mattidragon.configloader.api.GenerateMutable;
 
 import java.util.List;
 
-import static io.github.mattidragon.powernetworks.config.ConfigData.defaultingFieldOf;
-
+@GenerateMutable
 public record ClientCategory(int segmentsPerBlock, float wireWidth, float hangFactor, List<Integer> colors) {
     public static final ClientCategory DEFAULT = new ClientCategory(8, 0.05f, 1.5f, List.of(0x884832, 0xD07D59));
 
-    public static final Codec<ClientCategory> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            defaultingFieldOf(Codec.INT, "segmentsPerBlock", DEFAULT.segmentsPerBlock).forGetter(ClientCategory::segmentsPerBlock),
-            defaultingFieldOf(Codec.FLOAT, "wireWidth", DEFAULT.wireWidth).forGetter(ClientCategory::wireWidth),
-            defaultingFieldOf(Codec.FLOAT, "hangFactor", DEFAULT.hangFactor).forGetter(ClientCategory::hangFactor),
-            defaultingFieldOf(Codec.INT.listOf(), "colors", DEFAULT.colors).forGetter(ClientCategory::colors)
-    ).apply(instance, ClientCategory::new));
+    public static final Codec<ClientCategory> CODEC = RecordCodecBuilder.create(instance -> {
+        Codec<List<Integer>> codec = Codec.INT.listOf();
+        return instance.group(
+                DefaultedFieldCodec.of(Codec.INT, "segmentsPerBlock", DEFAULT.segmentsPerBlock).forGetter(ClientCategory::segmentsPerBlock),
+                DefaultedFieldCodec.of(Codec.FLOAT, "wireWidth", DEFAULT.wireWidth).forGetter(ClientCategory::wireWidth),
+                DefaultedFieldCodec.of(Codec.FLOAT, "hangFactor", DEFAULT.hangFactor).forGetter(ClientCategory::hangFactor),
+                DefaultedFieldCodec.of(codec, "colors", DEFAULT.colors).forGetter(ClientCategory::colors)
+        ).apply(instance, ClientCategory::new);
+    });
 
-    public Mutable toMutable() {
-        return new Mutable(this);
-    }
-
-    public static final class Mutable {
-        public int segmentsPerBlock;
-        public float wireWidth;
-        public float hangFactor;
-        public List<Integer> colors;
-
-        private Mutable(ClientCategory values) {
-            this.segmentsPerBlock = values.segmentsPerBlock;
-            this.wireWidth = values.wireWidth;
-            this.hangFactor = values.hangFactor;
-            this.colors = List.copyOf(values.colors);
-        }
-
-        public ClientCategory toImmutable() {
-            return new ClientCategory(segmentsPerBlock, wireWidth, hangFactor, colors);
-        }
+    public MutableClientCategory toMutable() {
+        return new MutableClientCategory(this);
     }
 }

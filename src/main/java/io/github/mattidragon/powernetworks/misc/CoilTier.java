@@ -1,7 +1,7 @@
 package io.github.mattidragon.powernetworks.misc;
 
+import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
-import io.github.mattidragon.powernetworks.config.PowerNetworksConfig;
 import net.minecraft.block.Block;
 
 public enum CoilTier {
@@ -11,7 +11,7 @@ public enum CoilTier {
     ULTIMATE;
 
     public long getTransferRate() {
-        var rates = PowerNetworksConfig.get().transferRates();
+        var rates = PowerNetworks.CONFIG.get().transferRates();
         return switch (this) {
             case BASIC    -> rates.basic();
             case IMPROVED -> rates.improved();

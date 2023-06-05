@@ -1,7 +1,7 @@
 {
   "config.power_networks": "Power Networks",
+
   "config.power_networks.transfer_rates": "Transfer Rates",
-  "config.power_networks.transfer_rates.description": "Controls the size of the internal buffer of coils. The buffer size directly affects the amount of energy that can flow through the coil. \n\nNote that each coil has two buffers of this size, one for input and one for output, so other mods may report the wrong capacity.",
   "config.power_networks.transfer_rates.basic": "Basic",
   "config.power_networks.transfer_rates.basic.description": "Controls the size of the internal buffer of basic coils. The buffer size directly affects the amount of energy that can flow through the coil. \n\nNote that each coil has two buffers of this size, one for input and one for output, so other mods may report the wrong capacity.",
   "config.power_networks.transfer_rates.improved": "Improved",

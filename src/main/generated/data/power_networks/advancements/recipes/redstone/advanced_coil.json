@@ -30,5 +30,6 @@
     "recipes": [
       "power_networks:advanced_coil"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

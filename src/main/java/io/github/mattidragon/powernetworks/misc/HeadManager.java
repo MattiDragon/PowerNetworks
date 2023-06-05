@@ -2,8 +2,8 @@ package io.github.mattidragon.powernetworks.misc;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.config.ConfigData;
-import io.github.mattidragon.powernetworks.config.PowerNetworksConfig;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -22,8 +22,8 @@ public class HeadManager {
     public static final GameProfile WIRE_ITEM_PROFILE = new GameProfile(Util.NIL_UUID, "");
 
     static {
-        HeadManager.setTextures(PowerNetworksConfig.get());
-        PowerNetworksConfig.ON_CHANGE.register(HeadManager::setTextures);
+        HeadManager.setTextures(PowerNetworks.CONFIG.get());
+        PowerNetworks.CONFIG.getChangeEvent().register(HeadManager::setTextures);
     }
 
     private HeadManager() {}
