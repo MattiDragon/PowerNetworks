@@ -32,7 +32,7 @@ public class NetworkUpdateHandler implements GraphEntity<NetworkUpdateHandler> {
         var coils = context.getGraph()
                 .getNodes()
                 .filter(node -> node.getNode() instanceof CoilNode)
-                .map(node -> CoilBlock.getBlockEntity(world, node.getPos()))
+                .map(node -> CoilBlock.getBlockEntity(world, node.getBlockPos()))
                 .filter(Objects::nonNull)
                 .toList();
 
@@ -98,6 +98,11 @@ public class NetworkUpdateHandler implements GraphEntity<NetworkUpdateHandler> {
             }
             transaction.commit();
         }
+    }
+
+    @Override
+    public @NotNull GraphEntityContext getContext() {
+        return context;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package io.github.mattidragon.powernetworks.client.config;
 
-import dev.isxander.yacl.api.OptionFlag;
+import dev.isxander.yacl3.api.OptionFlag;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;

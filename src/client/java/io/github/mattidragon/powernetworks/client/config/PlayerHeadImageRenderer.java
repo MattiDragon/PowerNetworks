@@ -2,7 +2,7 @@ package io.github.mattidragon.powernetworks.client.config;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import dev.isxander.yacl.gui.ImageRenderer;
+import dev.isxander.yacl3.gui.ImageRenderer;
 import net.minecraft.block.SkullBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;

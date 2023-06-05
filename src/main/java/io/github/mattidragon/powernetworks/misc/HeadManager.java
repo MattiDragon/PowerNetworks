@@ -23,7 +23,7 @@ public class HeadManager {
 
     static {
         HeadManager.setTextures(PowerNetworks.CONFIG.get());
-        PowerNetworks.CONFIG.getChangeEvent().register(HeadManager::setTextures);
+        PowerNetworks.CONFIG.getReloadEvent().register(HeadManager::setTextures);
     }
 
     private HeadManager() {}

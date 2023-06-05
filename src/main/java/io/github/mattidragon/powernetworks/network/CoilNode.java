@@ -1,6 +1,8 @@
 package io.github.mattidragon.powernetworks.network;
 
-import com.kneelawk.graphlib.api.graph.NodeContext;
+import com.kneelawk.graphlib.api.graph.NodeHolder;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import com.kneelawk.graphlib.api.wire.FullWireBlockNode;
 import io.github.mattidragon.powernetworks.PowerNetworks;
@@ -15,30 +17,31 @@ import java.util.List;
 public class CoilNode implements FullWireBlockNode {
     public static final Identifier ID = PowerNetworks.id("connection_coil");
     public static final CoilNode INSTANCE = new CoilNode();
+    public static final BlockNodeType TYPE = BlockNodeType.of(ID, tag -> INSTANCE);
 
     private CoilNode() {
     }
 
     @Override
-    public @NotNull Identifier getTypeId() {
-        return ID;
+    public @NotNull BlockNodeType getType() {
+        return TYPE;
     }
 
     @Override
-    public @NotNull Collection<HalfLink> findConnections(@NotNull NodeContext ctx) {
+    public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         return List.of();
     }
 
     @Override
-    public boolean canConnect(@NotNull NodeContext ctx, @NotNull HalfLink other) {
-        return other.other().getNode() instanceof CoilNode && ctx.getPos().getSquaredDistance(other.other().getPos()) <= 64;
+    public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
+        return other.other().getNode() instanceof CoilNode && self.getBlockPos().getSquaredDistance(other.other().getBlockPos()) <= 64;
     }
 
     @Override
-    public void onConnectionsChanged(@NotNull NodeContext ctx) {
-        var world = ctx.blockWorld();
-        var pos = ctx.getPos();
-        var state = world.getBlockState(pos);
+    public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
+        var world = self.getBlockWorld();
+        var pos = self.getBlockPos();
+        var state = self.getBlockState();
         world.updateListeners(pos, state, state, 0);
     }
 

@@ -8,6 +8,5 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "YACLDemoHackMixin"
   ]
 }

@@ -9,7 +9,7 @@ import io.github.mattidragon.configloader.api.GenerateMutable;
 import java.util.function.Function;
 
 @GenerateMutable
-public record TransferRatesCategory(long basic, long improved, long advanced, long ultimate) {
+public record TransferRatesCategory(long basic, long improved, long advanced, long ultimate) implements MutableTransferRatesCategory.Source {
     public static final TransferRatesCategory DEFAULT = new TransferRatesCategory(256, 1024, 4096, 16384);
 
     public static final Codec<TransferRatesCategory> CODEC = RecordCodecBuilder.create(instance -> {
@@ -32,9 +32,5 @@ public record TransferRatesCategory(long basic, long improved, long advanced, lo
             return DataResult.error(() -> "Transfer rate " + rate + " must be positive", rate);
         };
         return Codec.LONG.flatXmap(check, check);
-    }
-
-    public MutableTransferRatesCategory toMutable() {
-        return new MutableTransferRatesCategory(this);
     }
 }

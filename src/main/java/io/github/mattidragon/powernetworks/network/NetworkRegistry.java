@@ -10,7 +10,7 @@ import static io.github.mattidragon.powernetworks.PowerNetworks.id;
 
 public class NetworkRegistry {
     public static final GraphUniverse UNIVERSE = GraphUniverse.builder().build(id("networks"));
-    public static final GraphEntityType<NetworkUpdateHandler> UPDATE_HANDLER = new GraphEntityType<>(NetworkUpdateHandler.ID, NetworkUpdateHandler::new, (tag, ctx) -> new NetworkUpdateHandler(ctx), (original, originalGraph, ctx) -> new NetworkUpdateHandler(ctx));
+    public static final GraphEntityType<NetworkUpdateHandler> UPDATE_HANDLER = GraphEntityType.of(NetworkUpdateHandler.ID, NetworkUpdateHandler::new, (tag, ctx) -> new NetworkUpdateHandler(ctx), (original, originalGraph, ctx) -> new NetworkUpdateHandler(ctx));
 
     private NetworkRegistry() {
     }
@@ -23,11 +23,9 @@ public class NetworkRegistry {
             }
             return List.of();
         });
-        UNIVERSE.addNodeDecoder(CoilNode.ID, tag -> CoilNode.INSTANCE);
-
-        UNIVERSE.addLinkKeyDecoder(WireLinkKey.ID, tag -> WireLinkKey.INSTANCE);
-        UNIVERSE.addLinkEntityDecoder(WireLinkKey.Entity.ID, (tag, ctx) -> new WireLinkKey.Entity(ctx));
-
+        UNIVERSE.addNodeType(CoilNode.TYPE);
+        UNIVERSE.addLinkKeyType(WireLinkKey.TYPE);
+        UNIVERSE.addLinkEntityType(WireLinkKey.Entity.TYPE);
         UNIVERSE.addGraphEntityType(UPDATE_HANDLER);
     }
 }

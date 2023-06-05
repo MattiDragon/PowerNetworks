@@ -7,7 +7,7 @@ import io.github.mattidragon.configloader.api.GenerateMutable;
 
 @GenerateMutable
 public record TexturesCategory(String basicCoil, String improvedCoil, String advancedCoil, String ultimateCoil,
-                               String inputIndicator, String outputIndicator, String wire) {
+                               String inputIndicator, String outputIndicator, String wire) implements MutableTexturesCategory.Source {
     public static final TexturesCategory DEFAULT = new TexturesCategory(
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjUwNjI3NzJkMmM5MmUwMzU1YWMyZmNhOGMyYTQwY2M5NTViMDZmZTRkNWVmZWU3ODE5M2I4MTE2NjhkZmFkMCJ9fX0",
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGRkODAwMDYwMjFkZGM0YjIxMDYzMDMyMzZiNTYwNTUzYzliZTdkYjMwOGRkMTEzZGI4NmI2NGE1Yjk4ZDNhNyJ9fX0=",
@@ -26,8 +26,4 @@ public record TexturesCategory(String basicCoil, String improvedCoil, String adv
             DefaultedFieldCodec.of(Codec.STRING, "outputIndicator", DEFAULT.outputIndicator).forGetter(TexturesCategory::outputIndicator),
             DefaultedFieldCodec.of(Codec.STRING, "wire", DEFAULT.wire).forGetter(TexturesCategory::wire)
     ).apply(instance, TexturesCategory::new));
-
-    public MutableTexturesCategory toMutable() {
-        return new MutableTexturesCategory(this);
-    }
 }

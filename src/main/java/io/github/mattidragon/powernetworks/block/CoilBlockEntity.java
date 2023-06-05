@@ -54,7 +54,7 @@ public class CoilBlockEntity extends BlockEntity {
     }
 
     public static void connect(ServerWorld world, CoilBlockEntity first, CoilBlockEntity second) {
-        var graphWorld = NetworkRegistry.UNIVERSE.getGraphWorld(world);
+        var graphWorld = NetworkRegistry.UNIVERSE.getServerGraphWorld(world);
         graphWorld.connectNodes(new NodePos(first.pos, CoilNode.INSTANCE), new NodePos(second.pos, CoilNode.INSTANCE), WireLinkKey.INSTANCE);
 
         world.updateListeners(first.pos, first.getCachedState(), first.getCachedState(), 0);
@@ -82,16 +82,16 @@ public class CoilBlockEntity extends BlockEntity {
         if (!(world instanceof ServerWorld serverWorld))
             return;
 
-        var graphWorld = NetworkRegistry.UNIVERSE.getGraphWorld(serverWorld);
+        var graphWorld = NetworkRegistry.UNIVERSE.getServerGraphWorld(serverWorld);
         var node = graphWorld.getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
         if (node == null)
             return;
 
         for (var connection : node.getConnections()) {
             NodeHolder<BlockNode> other = connection.other(node);
-            graphWorld.disconnectNodes(node.toNodePos(), other.toNodePos(), WireLinkKey.INSTANCE);
-            var state = world.getBlockState(other.getPos());
-            world.updateListeners(other.getPos(), state, state, Block.NOTIFY_ALL);
+            graphWorld.disconnectNodes(node.getPos(), other.getPos(), WireLinkKey.INSTANCE);
+            var state = world.getBlockState(other.getBlockPos());
+            world.updateListeners(other.getBlockPos(), state, state, Block.NOTIFY_ALL);
         }
         world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_ALL);
     }
@@ -131,12 +131,12 @@ public class CoilBlockEntity extends BlockEntity {
         var nbt = super.toInitialChunkDataNbt();
         if (!(world instanceof ServerWorld serverWorld)) return nbt;
 
-        var node = NetworkRegistry.UNIVERSE.getGraphWorld(serverWorld).getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
+        var node = NetworkRegistry.UNIVERSE.getServerGraphWorld(serverWorld).getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
         if (node == null) return nbt;
 
         var list = new NbtList();
         for (var connection : node.getConnections()) {
-            list.add(NbtHelper.fromBlockPos(connection.other(node).getPos()));
+            list.add(NbtHelper.fromBlockPos(connection.other(node).getBlockPos()));
         }
         nbt.put("clientConnectionCache", list);
         return nbt;

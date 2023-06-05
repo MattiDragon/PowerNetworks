@@ -70,7 +70,7 @@ public class CoilDisplay {
         if (!(this.world instanceof ServerWorld serverWorld))
             return;
 
-        var graphWorld = NetworkRegistry.UNIVERSE.getGraphWorld(serverWorld);
+        var graphWorld = NetworkRegistry.UNIVERSE.getServerGraphWorld(serverWorld);
         var node = graphWorld.getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
         if (node == null)
             return;
@@ -80,12 +80,12 @@ public class CoilDisplay {
         for (var link : node.getConnections()) {
             if (!useDoubleLeads) {
                 // If y positions are different we use the bottom one for target
-                var pos2 = link.other(node).getPos();
+                var pos2 = link.other(node).getBlockPos();
                 if (pos.getY() < pos2.getY()) continue;
                 if (pos.getY() == pos2.getY() && pos.asLong() < pos2.asLong()) continue;
             }
 
-            var otherPos = link.other(node).getPos();
+            var otherPos = link.other(node).getBlockPos();
             removedConnections.remove(otherPos);
             if (!connectionElements.containsKey(otherPos)) {
                 var coil2 = CoilBlock.getBlockEntity(serverWorld, otherPos);
