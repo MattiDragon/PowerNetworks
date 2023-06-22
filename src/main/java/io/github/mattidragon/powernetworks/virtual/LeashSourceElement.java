@@ -32,7 +32,7 @@ public class LeashSourceElement extends GenericEntityElement {
 
     @Override
     public void startWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
-        if (!alwaysRender && PolymerServerNetworking.getSupportedVersion(player.networkHandler, PowerNetworksNetworking.CLIENT_RENDERING) == 0)
+        if (!alwaysRender && PowerNetworksNetworking.supportsClientRendering(player))
             return;
 
         super.startWatching(player, packetConsumer);

@@ -2,15 +2,19 @@ package io.github.mattidragon.powernetworks.network;
 
 import com.kneelawk.graphlib.api.graph.GraphUniverse;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
+import com.kneelawk.graphlib.api.graph.user.SyncProfile;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
+import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
 
 import java.util.List;
 
 import static io.github.mattidragon.powernetworks.PowerNetworks.id;
 
 public class NetworkRegistry {
-    public static final GraphUniverse UNIVERSE = GraphUniverse.builder().build(id("networks"));
-    public static final GraphEntityType<NetworkUpdateHandler> UPDATE_HANDLER = GraphEntityType.of(NetworkUpdateHandler.ID, NetworkUpdateHandler::new, (tag, ctx) -> new NetworkUpdateHandler(ctx), (original, originalGraph, ctx) -> new NetworkUpdateHandler(ctx));
+    public static final GraphUniverse UNIVERSE = GraphUniverse.builder()
+            .synchronizeToClient(SyncProfile.of(PowerNetworksNetworking::supportsClientRendering))
+            .build(id("networks"));
+    public static final GraphEntityType<NetworkUpdateHandler> UPDATE_HANDLER = GraphEntityType.of(NetworkUpdateHandler.ID, NetworkUpdateHandler::new, tag -> new NetworkUpdateHandler(), (original, originalGraph, newGraph) -> new NetworkUpdateHandler(), (buf, msgCtx) -> new NetworkUpdateHandler());
 
     private NetworkRegistry() {
     }

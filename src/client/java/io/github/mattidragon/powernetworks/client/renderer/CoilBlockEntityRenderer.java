@@ -1,7 +1,11 @@
 package io.github.mattidragon.powernetworks.client.renderer;
 
+import com.kneelawk.graphlib.api.graph.NodeHolder;
+import com.kneelawk.graphlib.api.util.NodePos;
 import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.block.CoilBlockEntity;
+import io.github.mattidragon.powernetworks.network.CoilNode;
+import io.github.mattidragon.powernetworks.network.NetworkRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -23,19 +27,22 @@ public class CoilBlockEntityRenderer implements BlockEntityRenderer<CoilBlockEnt
     public void render(CoilBlockEntity coil, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         var world = coil.getWorld();
         if (world == null) return;
-        world.getBlockState(coil.getPos());
+        var node = NetworkRegistry.UNIVERSE.getGraphView(world).getNodeAt(new NodePos(coil.getPos(), CoilNode.INSTANCE));
+        if (node == null) return;
 
-        var connections = coil.getClientConnectionCache()
+        var connections = node.getConnections()
                 .stream()
-                .filter(pos -> pos.asLong() < coil.getPos().asLong()) // Only one coil may render a connection, which one doesn't matter
+                .map(link -> link.other(node))
+                .map(NodeHolder::getBlockPos)
+                .filter(pos -> pos.asLong() < coil.getPos().asLong())
                 .toList();
 
         matrices.push();
         matrices.translate(0.5, 0.5, 0.5);
 
-        for (var dest : connections) {
-            var destLight = WorldRenderer.getLightmapCoordinates(world, coil.getPos());
-            drawConnection(coil.getPos(), dest, matrices, vertexConsumers, light, destLight);
+        for (var toPos : connections) {
+            var destinationLight = WorldRenderer.getLightmapCoordinates(world, coil.getPos());
+            drawConnection(coil.getPos(), toPos, matrices, vertexConsumers, light, destinationLight);
         }
 
         matrices.pop();

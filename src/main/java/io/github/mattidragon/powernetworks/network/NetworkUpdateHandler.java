@@ -19,11 +19,8 @@ import static io.github.mattidragon.powernetworks.PowerNetworks.id;
 
 public class NetworkUpdateHandler implements GraphEntity<NetworkUpdateHandler> {
     public static final Identifier ID = id("update_handler");
-    private final GraphEntityContext context;
 
-    public NetworkUpdateHandler(GraphEntityContext context) {
-        this.context = context;
-    }
+    private GraphEntityContext context;
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
@@ -98,6 +95,11 @@ public class NetworkUpdateHandler implements GraphEntity<NetworkUpdateHandler> {
             }
             transaction.commit();
         }
+    }
+
+    @Override
+    public void onInit(@NotNull GraphEntityContext context) {
+        this.context = context;
     }
 
     @Override

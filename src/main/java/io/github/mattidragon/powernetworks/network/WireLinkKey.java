@@ -15,7 +15,7 @@ import static io.github.mattidragon.powernetworks.PowerNetworks.id;
 public class WireLinkKey implements LinkKey {
     public static final Identifier ID = id("wire");
     public static final WireLinkKey INSTANCE = new WireLinkKey();
-    public static final LinkKeyType TYPE = LinkKeyType.of(ID, tag -> INSTANCE);
+    public static final LinkKeyType TYPE = LinkKeyType.of(ID, tag -> INSTANCE, (buf, ctx) -> INSTANCE);
 
     private WireLinkKey() {
     }
@@ -36,8 +36,8 @@ public class WireLinkKey implements LinkKey {
     }
 
     @Override
-    public @Nullable LinkEntity createLinkEntity(@NotNull LinkEntityContext ctx) {
-        return new Entity(ctx);
+    public @Nullable LinkEntity createLinkEntity(@NotNull LinkHolder<LinkKey> holder) {
+        return LinkKey.super.createLinkEntity(holder);
     }
 
     @Override
@@ -47,11 +47,12 @@ public class WireLinkKey implements LinkKey {
 
     public static class Entity implements LinkEntity {
         public static final Identifier ID = id("wire");
-        public static final LinkEntityType TYPE = LinkEntityType.of(ID, (tag, ctx) -> new Entity(ctx));
+        public static final LinkEntityType TYPE = LinkEntityType.of(ID, tag -> new Entity(), (buf, msgCtx) -> new Entity());
 
-        private final LinkEntityContext context;
+        private LinkEntityContext context;
 
-        public Entity(LinkEntityContext context) {
+        @Override
+        public void onInit(@NotNull LinkEntityContext context) {
             this.context = context;
         }
 
@@ -68,10 +69,6 @@ public class WireLinkKey implements LinkKey {
         @Override
         public @Nullable NbtElement toTag() {
             return null;
-        }
-
-        @Override
-        public void onUnload() {
         }
 
         @Override

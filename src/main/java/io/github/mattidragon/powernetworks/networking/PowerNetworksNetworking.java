@@ -3,6 +3,7 @@ package io.github.mattidragon.powernetworks.networking;
 import eu.pb4.polymer.networking.api.PolymerServerNetworking;
 import io.github.mattidragon.powernetworks.PowerNetworks;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -23,5 +24,9 @@ public class PowerNetworksNetworking {
             PowerNetworks.CONFIG.set(packet.config());
             player.sendMessage(Text.translatable("power_networks.config_edit.applied").formatted(Formatting.GREEN));
         });
+    }
+
+    public static boolean supportsClientRendering(ServerPlayerEntity player) {
+        return PolymerServerNetworking.getSupportedVersion(player.networkHandler, CLIENT_RENDERING) == 0;
     }
 }

@@ -3,7 +3,6 @@ package io.github.mattidragon.powernetworks.block;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
-import eu.pb4.polymer.networking.api.PolymerServerNetworking;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
 import io.github.mattidragon.powernetworks.network.NetworkRegistry;
 import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
@@ -46,7 +45,7 @@ public class CoilBlock extends RodBlock implements PolymerBlock, PolymerClientDe
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-        if (PolymerServerNetworking.getSupportedVersion(player.networkHandler, PowerNetworksNetworking.CLIENT_RENDERING) == 0)
+        if (PowerNetworksNetworking.supportsClientRendering(player))
             return state;
 
         return PolymerBlock.super.getPolymerBlockState(state, player);

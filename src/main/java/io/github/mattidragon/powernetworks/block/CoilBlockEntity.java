@@ -36,8 +36,6 @@ public class CoilBlockEntity extends BlockEntity {
     private CoilTransferMode transferMode = CoilTransferMode.DEFAULT;
     public final CoilEnergyStorage storage;
 
-    private final Set<BlockPos> clientConnectionCache = new HashSet<>();
-
     static {
         EnergyStorage.SIDED.registerForBlockEntity((coil, direction) -> {
             if (direction != coil.getCachedState().get(CoilBlock.FACING).getOpposite())
@@ -96,15 +94,6 @@ public class CoilBlockEntity extends BlockEntity {
         world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_ALL);
     }
 
-    public Set<BlockPos> getClientConnectionCache() {
-        return Collections.unmodifiableSet(clientConnectionCache);
-    }
-
-    public void setClientConnectionCache(Set<BlockPos> clientConnectionCache) {
-        this.clientConnectionCache.clear();
-        this.clientConnectionCache.addAll(clientConnectionCache);
-    }
-
     public void cycleTransferMode() {
         transferMode = switch (transferMode) {
             case DEFAULT -> CoilTransferMode.INPUT;
@@ -120,28 +109,6 @@ public class CoilBlockEntity extends BlockEntity {
             display.setTransferMode(transferMode);
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
-    }
-
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        var nbt = super.toInitialChunkDataNbt();
-        if (!(world instanceof ServerWorld serverWorld)) return nbt;
-
-        var node = NetworkRegistry.UNIVERSE.getServerGraphWorld(serverWorld).getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
-        if (node == null) return nbt;
-
-        var list = new NbtList();
-        for (var connection : node.getConnections()) {
-            list.add(NbtHelper.fromBlockPos(connection.other(node).getBlockPos()));
-        }
-        nbt.put("clientConnectionCache", list);
-        return nbt;
-    }
-
     @Override
     public void markRemoved() {
         super.markRemoved();
@@ -151,13 +118,6 @@ public class CoilBlockEntity extends BlockEntity {
 
     @Override
     public void readNbt(NbtCompound nbt) {
-        if (nbt.contains("clientConnectionCache", NbtElement.LIST_TYPE)) {
-            clientConnectionCache.clear();
-            for (var element : nbt.getList("clientConnectionCache", NbtElement.COMPOUND_TYPE)) {
-                clientConnectionCache.add(NbtHelper.toBlockPos((NbtCompound) element));
-            }
-        }
-
         storage.inputBuffer.amount = nbt.getLong("inputEnergyBuffer");
         storage.outputBuffer.amount = nbt.getLong("outputEnergyBuffer");
         transferMode = CoilTransferMode.getSafe(nbt.getByte("transferMode"));
