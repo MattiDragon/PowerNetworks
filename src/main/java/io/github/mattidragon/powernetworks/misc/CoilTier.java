@@ -11,12 +11,22 @@ public enum CoilTier {
     ULTIMATE;
 
     public long getTransferRate() {
-        var rates = PowerNetworks.CONFIG.get().transferRates();
+        var rates = PowerNetworks.CONFIG.get().coils().transferRates();
         return switch (this) {
             case BASIC    -> rates.basic();
             case IMPROVED -> rates.improved();
             case ADVANCED -> rates.advanced();
             case ULTIMATE -> rates.ultimate();
+        };
+    }
+
+    public long getCapacity() {
+        var capacities = PowerNetworks.CONFIG.get().coils().capacities();
+        return switch (this) {
+            case BASIC    -> capacities.basic();
+            case IMPROVED -> capacities.improved();
+            case ADVANCED -> capacities.advanced();
+            case ULTIMATE -> capacities.ultimate();
         };
     }
 

@@ -61,7 +61,7 @@ public class CoilDisplay {
         if (playerLeashes.containsKey(player))
             return;
 
-        var source = new LeashSourceElement(player.getId(), true);
+        var source = new LeashSourceElement(player.getId());
         holder.addElement(source);
         playerLeashes.put(player, source);
     }
@@ -91,7 +91,7 @@ public class CoilDisplay {
                 var coil2 = CoilBlock.getBlockEntity(serverWorld, otherPos);
                 if (coil2 == null || coil2.display == null)
                     continue;
-                var sourceElement = new LeashSourceElement(coil2.display.leashTarget.getEntityIds().getInt(0), false);
+                var sourceElement = new LeashSourceElement(coil2.display.leashTarget.getEntityIds().getInt(0));
                 holder.addElement(sourceElement);
                 connectionElements.put(otherPos, sourceElement);
             }

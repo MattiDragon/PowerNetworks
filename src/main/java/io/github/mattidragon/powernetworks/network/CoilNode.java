@@ -17,7 +17,7 @@ import java.util.List;
 public class CoilNode implements FullWireBlockNode {
     public static final Identifier ID = PowerNetworks.id("connection_coil");
     public static final CoilNode INSTANCE = new CoilNode();
-    public static final BlockNodeType TYPE = BlockNodeType.of(ID, tag -> INSTANCE, (buf, ctx) -> INSTANCE);
+    public static final BlockNodeType TYPE = BlockNodeType.of(ID, () -> INSTANCE);
 
     private CoilNode() {
     }

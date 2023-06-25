@@ -11,6 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,10 +24,12 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void power_networks$handleHeldWire(CallbackInfo ci) {
-        handleSingleHeldWire(getMainHandStack());
+        power_networks$handleSingleHeldWire(getMainHandStack());
+        power_networks$handleSingleHeldWire(getOffHandStack());
     }
 
-    private void handleSingleHeldWire(ItemStack stack) {
+    @Unique
+    private void power_networks$handleSingleHeldWire(ItemStack stack) {
         if (!stack.isOf(ModItems.WIRE)) return;
 
         var posNbt = stack.getSubNbt(WireItem.CONNECTION_POS_KEY);
@@ -34,7 +37,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
         var pos = NbtHelper.toBlockPos(posNbt);
         var coil = CoilBlock.getBlockEntity(this.getWorld(), pos);
-        if (coil == null) return;
+        if (coil == null || coil.display == null) return;
 
         coil.display.attachPlayerLeash((ServerPlayerEntity) (Object) this);
     }

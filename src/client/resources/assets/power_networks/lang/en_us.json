@@ -1,15 +1,27 @@
 {
   "config.power_networks": "Power Networks",
 
+  "config.power_networks.coils": "Coils",
+
   "config.power_networks.transfer_rates": "Transfer Rates",
   "config.power_networks.transfer_rates.basic": "Basic",
-  "config.power_networks.transfer_rates.basic.description": "Controls the size of the internal buffer of basic coils. The buffer size directly affects the amount of energy that can flow through the coil. \n\nNote that each coil has two buffers of this size, one for input and one for output, so other mods may report the wrong capacity.",
+  "config.power_networks.transfer_rates.basic.description": "Controls the amount of energy that can be inserted and extracted from a basic coil during one tick. The limits on insertion and extraction are separate.",
   "config.power_networks.transfer_rates.improved": "Improved",
-  "config.power_networks.transfer_rates.improved.description": "Controls the size of the internal buffer of improved coils. The buffer size directly affects the amount of energy that can flow through the coil. \n\nNote that each coil has two buffers of this size, one for input and one for output, so other mods may report the wrong capacity.",
+  "config.power_networks.transfer_rates.improved.description": "Controls the amount of energy that can be inserted and extracted from a improved coil during one tick. The limits on insertion and extraction are separate.",
   "config.power_networks.transfer_rates.advanced": "Advanced",
-  "config.power_networks.transfer_rates.advanced.description":  "Controls the size of the internal buffer of advanced coils. The buffer size directly affects the amount of energy that can flow through the coil. \n\nNote that each coil has two buffers of this size, one for input and one for output, so other mods may report the wrong capacity.",
+  "config.power_networks.transfer_rates.advanced.description": "Controls the amount of energy that can be inserted and extracted from a advanced coil during one tick. The limits on insertion and extraction are separate.",
   "config.power_networks.transfer_rates.ultimate": "Ultimate",
-  "config.power_networks.transfer_rates.ultimate.description": "Controls the size of the internal buffer of ultimate coils. The buffer size directly affects the amount of energy that can flow through the coil. \n\nNote that each coil has two buffers of this size, one for input and one for output, so other mods may report the wrong capacity.",
+  "config.power_networks.transfer_rates.ultimate.description": "Controls the amount of energy that can be inserted and extracted from a ultimate coil during one tick. The limits on insertion and extraction are separate.",
+
+  "config.power_networks.capacities": "Capacities",
+  "config.power_networks.capacities.basic": "Basic",
+  "config.power_networks.capacities.basic.description": "Controls the amount of energy capacity that each basic coil adds to a network.",
+  "config.power_networks.capacities.improved": "Improved",
+  "config.power_networks.capacities.improved.description": "Controls the amount of energy capacity that each improved coil adds to a network.",
+  "config.power_networks.capacities.advanced": "Advanced",
+  "config.power_networks.capacities.advanced.description":  "Controls the amount of energy capacity that each advanced coil adds to a network.",
+  "config.power_networks.capacities.ultimate": "Ultimate",
+  "config.power_networks.capacities.ultimate.description": "Controls the amount of energy capacity that each ultimate coil adds to a network.",
 
   "config.power_networks.textures": "Textures",
   "config.power_networks.textures.description": "These fields accept the base64 encoded json that you see in player heads. You can find example on the mods github page under src/main/resources/head_textures. \n\nTo create a new texture you need to create a new skin where the head has the texture of the coil, both layers are used. Then you set it as your minecraft skin and obtain you own head. \n\nYou can get the value from the head by inspecting it's nbt or copying it from the give command. Afterwards you can switch back to your previous skin, mojang stores all previously uploaded skins.",

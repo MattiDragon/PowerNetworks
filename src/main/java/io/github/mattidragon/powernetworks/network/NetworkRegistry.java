@@ -14,7 +14,6 @@ public class NetworkRegistry {
     public static final GraphUniverse UNIVERSE = GraphUniverse.builder()
             .synchronizeToClient(SyncProfile.of(PowerNetworksNetworking::supportsClientRendering))
             .build(id("networks"));
-    public static final GraphEntityType<NetworkUpdateHandler> UPDATE_HANDLER = GraphEntityType.of(NetworkUpdateHandler.ID, NetworkUpdateHandler::new, tag -> new NetworkUpdateHandler(), (original, originalGraph, newGraph) -> new NetworkUpdateHandler(), (buf, msgCtx) -> new NetworkUpdateHandler());
 
     private NetworkRegistry() {
     }
@@ -30,6 +29,6 @@ public class NetworkRegistry {
         UNIVERSE.addNodeType(CoilNode.TYPE);
         UNIVERSE.addLinkKeyType(WireLinkKey.TYPE);
         UNIVERSE.addLinkEntityType(WireLinkKey.Entity.TYPE);
-        UNIVERSE.addGraphEntityType(UPDATE_HANDLER);
+        UNIVERSE.addGraphEntityType(NetworkEnergyStorage.TYPE);
     }
 }

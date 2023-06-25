@@ -28,7 +28,7 @@ public class ConfigClient {
     }
 
     public static Screen createScreen(Screen parent, ConfigData config, Consumer<ConfigData> saveConsumer) {
-        var transferRates = config.transferRates().toMutable();
+        var coils = config.coils().toMutable();
         var textures = config.textures().toMutable();
         var misc = config.misc().toMutable();
         var client = config.client().toMutable();
@@ -36,39 +36,77 @@ public class ConfigClient {
         return YetAnotherConfigLib.createBuilder()
                 .title(Text.translatable("config.power_networks"))
                 .category(createTexturesCategory(textures))
-                .category(createTransferRatesCategory(transferRates))
+                .category(createCoilsCategory(coils))
                 .category(createMiscCategory(misc))
                 .category(createClientCategory(client))
-                .save(() -> saveConsumer.accept(new ConfigData(transferRates.toImmutable(), textures.toImmutable(), misc.toImmutable(), client.toImmutable())))
+                .save(() -> saveConsumer.accept(new ConfigData(coils.toImmutable(), textures.toImmutable(), misc.toImmutable(), client.toImmutable())))
                 .build()
                 .generateScreen(parent);
     }
 
-    private static ConfigCategory createTransferRatesCategory(MutableTransferRatesCategory transferRates) {
+    private static ConfigCategory createCoilsCategory(MutableCoilsCategory coils) {
         return ConfigCategory.createBuilder()
+                .name(Text.translatable("config.power_networks.coils"))
+                .group(createTransferRatesGroup(coils.transferRates()))
+                .group(createCapacitiesGroup(coils.capacities()))
+                .build();
+    }
+
+    private static OptionGroup createTransferRatesGroup(MutableCoilsCategory.MutableTransferRatesGroup transferRates) {
+        return OptionGroup.createBuilder()
                 .name(Text.translatable("config.power_networks.transfer_rates"))
                 .option(Option.<Long>createBuilder()
                         .name(Text.translatable("config.power_networks.transfer_rates.basic"))
                         .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.basic.description")))
-                        .binding(DEFAULT.transferRates().basic(), transferRates::basic, transferRates::basic)
+                        .binding(DEFAULT.coils().transferRates().basic(), transferRates::basic, transferRates::basic)
                         .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
                         .build())
                 .option(Option.<Long>createBuilder()
                         .name(Text.translatable("config.power_networks.transfer_rates.improved"))
                         .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.improved.description")))
-                        .binding(DEFAULT.transferRates().improved(), transferRates::improved, transferRates::improved)
+                        .binding(DEFAULT.coils().transferRates().improved(), transferRates::improved, transferRates::improved)
                         .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
                         .build())
                 .option(Option.<Long>createBuilder()
                         .name(Text.translatable("config.power_networks.transfer_rates.advanced"))
                         .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.advanced.description")))
-                        .binding(DEFAULT.transferRates().advanced(), transferRates::advanced, transferRates::advanced)
+                        .binding(DEFAULT.coils().transferRates().advanced(), transferRates::advanced, transferRates::advanced)
                         .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
                         .build())
                 .option(Option.<Long>createBuilder()
                         .name(Text.translatable("config.power_networks.transfer_rates.ultimate"))
                         .description(OptionDescription.of(Text.translatable("config.power_networks.transfer_rates.ultimate.description")))
-                        .binding(DEFAULT.transferRates().ultimate(), transferRates::ultimate, transferRates::ultimate)
+                        .binding(DEFAULT.coils().transferRates().ultimate(), transferRates::ultimate, transferRates::ultimate)
+                        .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                        .build())
+                .build();
+    }
+
+    private static OptionGroup createCapacitiesGroup(MutableCoilsCategory.MutableCapacitiesGroup capacities) {
+        return OptionGroup.createBuilder()
+                .name(Text.translatable("config.power_networks.capacities"))
+                .option(Option.<Long>createBuilder()
+                        .name(Text.translatable("config.power_networks.capacities.basic"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.capacities.basic.description")))
+                        .binding(DEFAULT.coils().capacities().basic(), capacities::basic, capacities::basic)
+                        .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                        .build())
+                .option(Option.<Long>createBuilder()
+                        .name(Text.translatable("config.power_networks.capacities.improved"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.capacities.improved.description")))
+                        .binding(DEFAULT.coils().capacities().improved(), capacities::improved, capacities::improved)
+                        .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                        .build())
+                .option(Option.<Long>createBuilder()
+                        .name(Text.translatable("config.power_networks.capacities.advanced"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.capacities.advanced.description")))
+                        .binding(DEFAULT.coils().capacities().advanced(), capacities::advanced, capacities::advanced)
+                        .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
+                        .build())
+                .option(Option.<Long>createBuilder()
+                        .name(Text.translatable("config.power_networks.capacities.ultimate"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.capacities.ultimate.description")))
+                        .binding(DEFAULT.coils().capacities().ultimate(), capacities::ultimate, capacities::ultimate)
                         .controller(option -> LongFieldControllerBuilder.create(option).min(1L))
                         .build())
                 .build();

@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.util.NodePos;
 import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.block.CoilBlockEntity;
+import io.github.mattidragon.powernetworks.item.WireItem;
 import io.github.mattidragon.powernetworks.network.CoilNode;
 import io.github.mattidragon.powernetworks.network.NetworkRegistry;
 import net.minecraft.client.render.RenderLayer;
@@ -13,8 +14,10 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -27,29 +30,40 @@ public class CoilBlockEntityRenderer implements BlockEntityRenderer<CoilBlockEnt
     public void render(CoilBlockEntity coil, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         var world = coil.getWorld();
         if (world == null) return;
-        var node = NetworkRegistry.UNIVERSE.getGraphView(world).getNodeAt(new NodePos(coil.getPos(), CoilNode.INSTANCE));
+        var pos = coil.getPos();
+        var node = NetworkRegistry.UNIVERSE.getGraphView(world).getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
         if (node == null) return;
 
-        var connections = node.getConnections()
+        var playerConnections = ((ClientWorld) world).getPlayers()
+                .stream()
+                .filter(player -> WireItem.hasAttachmentTo(player, pos))
+                .toList();
+
+        var blockConnections = node.getConnections()
                 .stream()
                 .map(link -> link.other(node))
                 .map(NodeHolder::getBlockPos)
-                .filter(pos -> pos.asLong() < coil.getPos().asLong())
+                .filter(otherPos -> otherPos.asLong() < pos.asLong())
                 .toList();
 
         matrices.push();
         matrices.translate(0.5, 0.5, 0.5);
 
-        for (var toPos : connections) {
-            var destinationLight = WorldRenderer.getLightmapCoordinates(world, coil.getPos());
-            drawConnection(coil.getPos(), toPos, matrices, vertexConsumers, light, destinationLight);
+        for (var player : playerConnections) {
+            var destinationLight = WorldRenderer.getLightmapCoordinates(world, BlockPos.ofFloored(player.getCameraPosVec(tickDelta)));
+            drawConnection(Vec3d.ofCenter(pos), player.getLeashPos(tickDelta), matrices, vertexConsumers, light, destinationLight);
+        }
+
+        for (var toPos : blockConnections) {
+            var destinationLight = WorldRenderer.getLightmapCoordinates(world, pos);
+            drawConnection(Vec3d.ofCenter(pos), Vec3d.ofCenter(toPos), matrices, vertexConsumers, light, destinationLight);
         }
 
         matrices.pop();
     }
 
-    private static void drawConnection(BlockPos fromPos, BlockPos toPos, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int fromLight, int toLight) {
-        var offset = new Vector3f(toPos.getX() - fromPos.getX(), toPos.getY() - fromPos.getY(), toPos.getZ() - fromPos.getZ());
+    private static void drawConnection(Vec3d fromPos, Vec3d toPos, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int fromLight, int toLight) {
+        var offset = new Vector3f((float) (toPos.x - fromPos.x), (float) (toPos.y - fromPos.y), (float) (toPos.z - fromPos.z));
         var segments = (int) offset.length() * PowerNetworks.CONFIG.get().client().segmentsPerBlock();
         var segmentOffset = offset.div(segments, new Vector3f());
 

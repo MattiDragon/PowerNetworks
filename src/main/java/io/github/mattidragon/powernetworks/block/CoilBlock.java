@@ -63,7 +63,8 @@ public class CoilBlock extends RodBlock implements PolymerBlock, PolymerClientDe
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
-        tooltip.add(Text.translatable("block.power_networks.coil.buffer_size", Text.literal(String.valueOf(tier.getTransferRate())).formatted(Formatting.YELLOW)).formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("block.power_networks.coil.capacity", Text.literal(String.valueOf(tier.getCapacity())).formatted(Formatting.YELLOW)).formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("block.power_networks.coil.transfer_rate", Text.literal(String.valueOf(tier.getTransferRate())).formatted(Formatting.YELLOW)).formatted(Formatting.GRAY));
     }
 
     public CoilTier getTier() {

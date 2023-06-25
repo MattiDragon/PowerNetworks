@@ -3,7 +3,7 @@ package io.github.mattidragon.powernetworks.block;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.util.NodePos;
-import io.github.mattidragon.powernetworks.misc.CoilEnergyStorage;
+import io.github.mattidragon.powernetworks.misc.CoilEnergyAccess;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
 import io.github.mattidragon.powernetworks.misc.CoilTransferMode;
 import io.github.mattidragon.powernetworks.network.CoilNode;
@@ -14,27 +14,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.EnergyStorageUtil;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class CoilBlockEntity extends BlockEntity {
-    public CoilDisplay display;
     private CoilTransferMode transferMode = CoilTransferMode.DEFAULT;
-    public final CoilEnergyStorage storage;
+    public CoilDisplay display;
+    private final CoilTier tier;
+    public final CoilEnergyAccess storage;
 
     static {
         EnergyStorage.SIDED.registerForBlockEntity((coil, direction) -> {
@@ -47,8 +39,8 @@ public class CoilBlockEntity extends BlockEntity {
 
     public CoilBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlocks.COIL_BLOCK_ENTITY, pos, state);
-        var tier = CoilTier.ofBlock(state.getBlock());
-        storage = new CoilEnergyStorage(tier.getTransferRate(), transferMode, this::markDirty);
+        tier = CoilTier.ofBlock(state.getBlock());
+        storage = new CoilEnergyAccess(this);
     }
 
     public static void connect(ServerWorld world, CoilBlockEntity first, CoilBlockEntity second) {
@@ -64,16 +56,7 @@ public class CoilBlockEntity extends BlockEntity {
             coil.display = new CoilDisplay(world, pos, coil.transferMode);
 
         coil.display.tick();
-        coil.pushEnergy();
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    private void pushEnergy() {
-        var direction = getCachedState().get(CoilBlock.FACING).getOpposite();
-        var target = EnergyStorage.SIDED.find(world, pos.offset(direction), direction);
-        if (target != null) {
-            EnergyStorageUtil.move(storage, target, Long.MAX_VALUE, null);
-        }
+        coil.storage.resetLimits();
     }
 
     public void disconnectAllConnections() {
@@ -85,7 +68,7 @@ public class CoilBlockEntity extends BlockEntity {
         if (node == null)
             return;
 
-        for (var connection : node.getConnections()) {
+        for (var connection : List.copyOf(node.getConnections())) {
             NodeHolder<BlockNode> other = connection.other(node);
             graphWorld.disconnectNodes(node.getPos(), other.getPos(), WireLinkKey.INSTANCE);
             var state = world.getBlockState(other.getBlockPos());
@@ -104,9 +87,12 @@ public class CoilBlockEntity extends BlockEntity {
     }
 
     private void onTransferModeChanged() {
-        storage.setTransferMode(transferMode);
         if (display != null) // If it's null it'll be created with the new mode
             display.setTransferMode(transferMode);
+    }
+
+    public CoilTier getTier() {
+        return tier;
     }
 
     @Override
@@ -118,16 +104,16 @@ public class CoilBlockEntity extends BlockEntity {
 
     @Override
     public void readNbt(NbtCompound nbt) {
-        storage.inputBuffer.amount = nbt.getLong("inputEnergyBuffer");
-        storage.outputBuffer.amount = nbt.getLong("outputEnergyBuffer");
         transferMode = CoilTransferMode.getSafe(nbt.getByte("transferMode"));
         onTransferModeChanged();
     }
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        nbt.putLong("inputEnergyBuffer", storage.inputBuffer.amount);
-        nbt.putLong("outputEnergyBuffer", storage.outputBuffer.amount);
         nbt.putByte("transferMode", (byte) transferMode.ordinal());
+    }
+
+    public CoilTransferMode getTransferMode() {
+        return transferMode;
     }
 }

@@ -1,10 +1,12 @@
 package io.github.mattidragon.powernetworks.item;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
 import io.github.mattidragon.powernetworks.block.CoilBlockEntity;
 import io.github.mattidragon.powernetworks.misc.HeadManager;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -26,18 +28,22 @@ public class WireItem extends Item implements PolymerItem {
 
     @Nullable
     public static BlockPos getPos(ItemStack stack) {
-        var nbt = stack.getSubNbt(WireItem.CONNECTION_POS_KEY);
-        if (nbt == null)
+        var itemNbt = PolymerItemUtils.getPolymerNbt(stack);
+        if (itemNbt == null) itemNbt = stack.getNbt();
+        if (itemNbt == null) return null;
+
+        var posNbt = itemNbt.getCompound(WireItem.CONNECTION_POS_KEY);
+        if (posNbt == null)
             return null;
 
-        return NbtHelper.toBlockPos(nbt);
+        return NbtHelper.toBlockPos(posNbt);
     }
 
     /**
      * Checks if a player is holding a wire that is targeting the specified position
      * @return {@code true} if the player is holding at least one such wire
      */
-    public static boolean hasAttachmentTo(ServerPlayerEntity player, BlockPos pos) {
+    public static boolean hasAttachmentTo(PlayerEntity player, BlockPos pos) {
         return pos.equals(getPos(player.getMainHandStack())) || pos.equals(getPos(player.getOffHandStack()));
     }
 
@@ -55,7 +61,7 @@ public class WireItem extends Item implements PolymerItem {
             if (connectionNbt != null) {
                 var coil2 = CoilBlock.getBlockEntity(world, NbtHelper.toBlockPos(connectionNbt));
 
-                if (coil1 == null || coil2 == null || coil1 == coil2) {
+                if (coil1 == null || coil2 == null || coil1 == coil2 || coil1.getPos().getSquaredDistance(coil2.getPos()) > 64) {
                     stack.removeSubNbt(CONNECTION_POS_KEY);
                     return ActionResult.FAIL;
                 }
@@ -63,10 +69,11 @@ public class WireItem extends Item implements PolymerItem {
                 CoilBlockEntity.connect(serverWorld, coil1, coil2);
                 stack.decrement(1);
                 stack.removeSubNbt(CONNECTION_POS_KEY);
-            } else {
+                return ActionResult.SUCCESS;
+            } else if (world.getBlockState(pos).getBlock() instanceof CoilBlock) {
                 stack.setSubNbt(CONNECTION_POS_KEY, NbtHelper.fromBlockPos(pos));
+                return ActionResult.SUCCESS;
             }
-            return ActionResult.SUCCESS;
         }
 
         return ActionResult.PASS;

@@ -8,6 +8,7 @@ import net.minecraft.registry.Registry;
 
 public class ModItems {
     public static final WireItem WIRE = new WireItem(new FabricItemSettings());
+    public static final AnalyzerItem ANALYZER = new AnalyzerItem(new FabricItemSettings());
     public static final CoilBlockItem BASIC_COIL = new CoilBlockItem(ModBlocks.BASIC_COIL, new FabricItemSettings());
     public static final CoilBlockItem IMPROVED_COIL = new CoilBlockItem(ModBlocks.IMPROVED_COIL, new FabricItemSettings());
     public static final CoilBlockItem ADVANCED_COIL = new CoilBlockItem(ModBlocks.ADVANCED_COIL, new FabricItemSettings());
@@ -23,5 +24,6 @@ public class ModItems {
         Registry.register(Registries.ITEM, PowerNetworks.id("ultimate_coil"), ULTIMATE_COIL);
 
         Registry.register(Registries.ITEM, PowerNetworks.id("wire"), WIRE);
+        Registry.register(Registries.ITEM, PowerNetworks.id("analyzer"), ANALYZER);
     }
 }

@@ -15,12 +15,23 @@ If in doubt, you should use REI as it has the best mod compatibility on fabric.
 
 Once you have your coils you can place them on your energy sources and consumers.
 Then use the wire to connect the coils by first clicking on one and then the other.
-You can configure nodes to only transfer in one direction by clicking on them.
+You can configure nodes to only transfer in one direction by clicking on them with an empty hand.
+This is important because you can often end up with a coil pushing all the energy it gets back into the source.
 Different tiers of coils have different capacities. See the next section for more details.
 
 ## How It Works
 When building optimized power delivery systems it's useful to know how ones mods work.
 This section documents how coils behave to avoid unnecessary confusion.
+
+Energy is stored globally in a network, shared across all coils. 
+Whenever something external inserts into or extracts from the network it is forwarded to the internal buffer 
+after applying the transfer rate limits of the coil.
+
+Once every tick the network will push out energy somewhat evenly throughout all the coils. 
+The transfer rate limits are shared between this automatic export and external extraction from other mods.
+
+<details>
+<summary>Pre 1.20 distribution logic</summary>
 
 Coils internally have two energy buffers, both with the size of the transfer rate of the tier, one for input and one for output.
 Whenever another mod pushes energy into a coil it goes into the energy buffer and whenever other mods pull energy it comes from the output buffer.
@@ -31,6 +42,8 @@ Because of the dual buffers you often see coils that appear to only be half full
 When the first coil on a network ticks, after having pushed its energy, it ticks the network.
 During a network tick all the energy that can be is moved from the input buffers to the output buffers.
 The energy is evenly distributed to all output buffers, but the removal from the input buffers is in an arbitrary order.
+
+</details>
 
 ## Modpacks
 You may use this mod in any modpacks you create. I'd prefer if you don't distribute the jar directly, but instead link to it. 

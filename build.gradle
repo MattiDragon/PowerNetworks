@@ -41,7 +41,9 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:$modmenu_version"
 
     // Tech reborn for testing
-//    modRuntimeOnly "TechReborn:TechReborn-1.19:5.6.0"
+/*    modRuntimeOnly("TechReborn:TechReborn-1.20:5.8.1") {
+        exclude group: "me.shedaniel", module: "RoughlyEnoughItems-fabric" // Skip transitive runtime dependency on REI
+    }*/
 
     // Add generated data to runtime classpath (slightly hacky)
     runtimeOnly files("src/main/generated")

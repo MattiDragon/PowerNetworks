@@ -1,6 +1,5 @@
 package io.github.mattidragon.powernetworks.virtual;
 
-import eu.pb4.polymer.networking.api.PolymerServerNetworking;
 import eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement;
 import io.github.mattidragon.powernetworks.misc.UnsafeUtil;
 import io.github.mattidragon.powernetworks.mixin.EntityAttachS2CPacketAccess;
@@ -17,11 +16,9 @@ import java.util.function.Consumer;
 
 public class LeashSourceElement extends GenericEntityElement {
     private final int targetId;
-    private final boolean alwaysRender;
 
-    public LeashSourceElement(int targetId, boolean alwaysRender) {
+    public LeashSourceElement(int targetId) {
         this.targetId = targetId;
-        this.alwaysRender = alwaysRender;
         dataTracker.set(SlimeEntity.SLIME_SIZE, 0);
     }
 
@@ -32,7 +29,7 @@ public class LeashSourceElement extends GenericEntityElement {
 
     @Override
     public void startWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
-        if (!alwaysRender && PowerNetworksNetworking.supportsClientRendering(player))
+        if (PowerNetworksNetworking.supportsClientRendering(player))
             return;
 
         super.startWatching(player, packetConsumer);
@@ -43,10 +40,5 @@ public class LeashSourceElement extends GenericEntityElement {
         leashPacketAccess.setHoldingId(targetId);
         leashPacketAccess.setAttachedId(getEntityIds().getInt(0));
         packetConsumer.accept(leashPacket);
-    }
-
-    @Override
-    public void stopWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
-        super.stopWatching(player, packetConsumer);
     }
 }
