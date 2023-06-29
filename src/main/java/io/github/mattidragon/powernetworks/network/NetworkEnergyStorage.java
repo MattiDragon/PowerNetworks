@@ -116,7 +116,7 @@ public class NetworkEnergyStorage extends SnapshotParticipant<NetworkEnergyStora
 
     @Override
     public void onTick() {
-        var totalTransferRate = getCapacity(context.getGraph());
+        var totalTransferRate = getTransferRate(context.getGraph());
         try (var transaction = Transaction.openOuter()) {
             long moved;
             do {
@@ -200,6 +200,17 @@ public class NetworkEnergyStorage extends SnapshotParticipant<NetworkEnergyStora
     }
 
     private static long getCapacity(BlockGraph graph) {
+        return graph.getNodes()
+                .map(NodeHolder::getBlockState)
+                .map(BlockState::getBlock)
+                .filter(CoilBlock.class::isInstance)
+                .map(CoilBlock.class::cast)
+                .map(CoilBlock::getTier)
+                .mapToLong(CoilTier::getCapacity)
+                .sum();
+    }
+
+    private static long getTransferRate(BlockGraph graph) {
         return graph.getNodes()
                 .map(NodeHolder::getBlockState)
                 .map(BlockState::getBlock)

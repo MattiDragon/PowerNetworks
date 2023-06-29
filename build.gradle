@@ -34,7 +34,7 @@ dependencies {
     modImplementation include("xyz.nucleoid:server-translations-api:$server_translation_api_version")
     modImplementation include("teamreborn:energy:$energy_version")
     modImplementation include("com.kneelawk:graphlib:$graphlib_version")
-    modImplementation annotationProcessor(include("io.github.mattidragon.configtoolkit:ConfigToolkit:1.0.0-alpha.9"))
+    modImplementation annotationProcessor(include("com.github.mattidragon:ConfigToolkit:$configtoolkit_version"))
 
     // Config
     modImplementation include("dev.isxander.yacl:yet-another-config-lib-fabric:$yacl_version")
