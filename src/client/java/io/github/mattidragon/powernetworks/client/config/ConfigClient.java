@@ -124,6 +124,12 @@ public class ConfigClient {
                         .binding(DEFAULT.misc().useDoubleLeads(), misc::useDoubleLeads, misc::useDoubleLeads)
                         .controller(TickBoxControllerBuilder::create)
                         .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.translatable("config.power_networks.misc.allowAdventureModeInteractions"))
+                        .description(OptionDescription.of(Text.translatable("config.power_networks.misc.allowAdventureModeInteractions.description")))
+                        .binding(DEFAULT.misc().allowAdventureModeInteractions(), misc::allowAdventureModeInteractions, misc::allowAdventureModeInteractions)
+                        .controller(TickBoxControllerBuilder::create)
+                        .build())
                 .build();
     }
 

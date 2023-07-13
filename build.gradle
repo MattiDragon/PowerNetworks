@@ -1,6 +1,6 @@
 plugins {
-	id 'fabric-loom' version '1.1-SNAPSHOT'
-    id 'io.github.juuxel.loom-quiltflower' version '1.8.0'
+	id 'fabric-loom' version '1.3-SNAPSHOT'
+    id 'io.github.juuxel.loom-vineflower' version '1.11.0'
 	id 'maven-publish'
 }
 
@@ -16,6 +16,8 @@ repositories {
     mavenLocal()
     maven { url "https://jitpack.io" }
 }
+
+loom.splitEnvironmentSourceSets()
 
 dependencies {
     minecraft "com.mojang:minecraft:$minecraft_version"
@@ -34,7 +36,8 @@ dependencies {
     modImplementation include("xyz.nucleoid:server-translations-api:$server_translation_api_version")
     modImplementation include("teamreborn:energy:$energy_version")
     modImplementation include("com.kneelawk:graphlib:$graphlib_version")
-    modImplementation annotationProcessor(include("com.github.mattidragon:ConfigToolkit:$configtoolkit_version"))
+    modImplementation include("com.github.mattidragon:ConfigToolkit:$configtoolkit_version")
+    annotationProcessor clientAnnotationProcessor("com.github.mattidragon:ConfigToolkit:$configtoolkit_version")
 
     // Config
     modImplementation include("dev.isxander.yacl:yet-another-config-lib-fabric:$yacl_version")
@@ -50,31 +53,27 @@ dependencies {
 }
 
 loom {
-    splitEnvironmentSourceSets()
     getAccessWidenerPath().set file("src/main/resources/power_networks.accesswidener")
 
-    mods {
-        "power_networks" {
-            sourceSet sourceSets.main
-            sourceSet sourceSets.client
-            modFiles.from file("src/main/generated")
-        }
+    mods.register("power_networks") {
+        sourceSet sourceSets.main
+        sourceSet sourceSets.client
+        modFiles.from file("src/main/generated")
     }
 
-    runs {
-        datagen {
-            inherit server
-            name "Data Generation"
-            vmArg "-Dfabric-api.datagen"
-            vmArg "-Dfabric-api.datagen.modid=power_networks"
-            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
-            vmArg "-Dfabric-api.datagen.strict-validation"
+    runs.register("datagen") {
+        inherit runs.server
+        name "Data Generation"
+        vmArg "-Dfabric-api.datagen"
+        vmArg "-Dfabric-api.datagen.modid=power_networks"
+        vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+        vmArg "-Dfabric-api.datagen.strict-validation"
 
-            ideConfigGenerated true
- 
-            runDir "build/datagen"
-        }
+        ideConfigGenerated true
+
+        runDir "build/datagen"
     }
+
 }
 
 // Delete datagen on clean

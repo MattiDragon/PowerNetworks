@@ -3,6 +3,7 @@ package io.github.mattidragon.powernetworks.block;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
+import io.github.mattidragon.powernetworks.PowerNetworks;
 import io.github.mattidragon.powernetworks.misc.CoilTier;
 import io.github.mattidragon.powernetworks.network.NetworkRegistry;
 import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;
@@ -79,6 +80,8 @@ public class CoilBlock extends RodBlock implements PolymerBlock, PolymerClientDe
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (!player.getAbilities().allowModifyWorld && !PowerNetworks.CONFIG.get().misc().allowAdventureModeInteractions()) return ActionResult.PASS;
+
         var coil = getBlockEntity(world, pos);
         if (coil == null)
             return ActionResult.FAIL;

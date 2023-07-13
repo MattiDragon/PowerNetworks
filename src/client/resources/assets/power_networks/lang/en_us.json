@@ -41,6 +41,8 @@
   "config.power_networks.misc": "Misc",
   "config.power_networks.misc.useDoubleLeads": "Use Double Leads",
   "config.power_networks.misc.useDoubleLeads.description": "When enabled, server side connections will use two leads, one in each direction, instead of one. This causes some z-fighting, but can be helpful in some cases if the lead is culled from some angle, although this is rarely useful.",
+  "config.power_networks.misc.allowAdventureModeInteractions": "Adventure Mode Interactions",
+  "config.power_networks.misc.allowAdventureModeInteractions.description": "When enabled, adventure mode players can interact with coils in certain ways. Might be useful in some cases.",
 
   "config.power_networks.client": "Client",
   "config.power_networks.client.segmentsPerBlock": "Segments Per Block",
