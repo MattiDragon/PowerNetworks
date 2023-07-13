@@ -50,6 +50,7 @@ public class PowerNetworks implements ModInitializer {
 							entries.add(ModItems.IMPROVED_COIL);
 							entries.add(ModItems.ADVANCED_COIL);
 							entries.add(ModItems.ULTIMATE_COIL);
+							entries.add(ModItems.ANALYZER);
 						})
 						.build());
 
