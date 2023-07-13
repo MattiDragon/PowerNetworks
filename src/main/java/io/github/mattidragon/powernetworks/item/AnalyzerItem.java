@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
@@ -52,11 +53,12 @@ public class AnalyzerItem extends Item implements PolymerItem {
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         if (context.getPlayer() == null) return ActionResult.PASS; // Can't show message anyway
-        var world = context.getWorld();
+        if (!(context.getWorld() instanceof ServerWorld world)) return ActionResult.SUCCESS; // No need to do math on client as we only send message from server anyway
+
         var pos = context.getBlockPos();
-        var graph = NetworkRegistry.UNIVERSE.getGraphView(world).getGraphForNode(new NodePos(pos, CoilNode.INSTANCE));
+        var graph = NetworkRegistry.UNIVERSE.getServerGraphWorld(world).getGraphForNode(new NodePos(pos, CoilNode.INSTANCE));
         if (graph == null) return ActionResult.PASS;
-        if (world.isClient) return ActionResult.SUCCESS; // No need to do math on client as we only send message from server anyway
+
         var storage = graph.getGraphEntity(NetworkEnergyStorage.TYPE);
         var profiles = storage.getProfiles();
 

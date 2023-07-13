@@ -2,7 +2,10 @@ package io.github.mattidragon.powernetworks.network;
 
 import com.kneelawk.graphlib.api.graph.LinkEntityContext;
 import com.kneelawk.graphlib.api.graph.LinkHolder;
-import com.kneelawk.graphlib.api.graph.user.*;
+import com.kneelawk.graphlib.api.graph.user.LinkEntity;
+import com.kneelawk.graphlib.api.graph.user.LinkEntityType;
+import com.kneelawk.graphlib.api.graph.user.LinkKey;
+import com.kneelawk.graphlib.api.graph.user.LinkKeyType;
 import io.github.mattidragon.powernetworks.item.ModItems;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;

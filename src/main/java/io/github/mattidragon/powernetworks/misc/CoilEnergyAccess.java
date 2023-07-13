@@ -24,8 +24,9 @@ public class CoilEnergyAccess extends SnapshotParticipant<CoilEnergyAccess.Snaps
     private EnergyStorage getUnderlyingStorage() {
         if (owner.getWorld() == null) return new SimpleEnergyStorage(0, 0, 0);
 
-        var graph = NetworkRegistry.UNIVERSE.getGraphView(owner.getWorld())
-                .getGraphForNode(new NodePos(owner.getPos(), CoilNode.INSTANCE));
+        var graphView = NetworkRegistry.UNIVERSE.getSidedGraphView(owner.getWorld());
+        if (graphView == null) return new SimpleEnergyStorage(0, 0, 0);
+        var graph = graphView.getGraphForNode(new NodePos(owner.getPos(), CoilNode.INSTANCE));
         if (graph == null) return new SimpleEnergyStorage(0, 0, 0);
 
         return graph.getGraphEntity(NetworkEnergyStorage.TYPE);

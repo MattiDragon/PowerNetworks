@@ -1,7 +1,6 @@
 package io.github.mattidragon.powernetworks.network;
 
 import com.kneelawk.graphlib.api.graph.GraphUniverse;
-import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
 import com.kneelawk.graphlib.api.graph.user.SyncProfile;
 import io.github.mattidragon.powernetworks.block.CoilBlock;
 import io.github.mattidragon.powernetworks.networking.PowerNetworksNetworking;

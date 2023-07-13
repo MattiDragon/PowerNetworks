@@ -31,7 +31,9 @@ public class CoilBlockEntityRenderer implements BlockEntityRenderer<CoilBlockEnt
         var world = coil.getWorld();
         if (world == null) return;
         var pos = coil.getPos();
-        var node = NetworkRegistry.UNIVERSE.getGraphView(world).getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
+        var graphView = NetworkRegistry.UNIVERSE.getSidedGraphView(world);
+        if (graphView == null) return;
+        var node = graphView.getNodeAt(new NodePos(pos, CoilNode.INSTANCE));
         if (node == null) return;
 
         var playerConnections = ((ClientWorld) world).getPlayers()
