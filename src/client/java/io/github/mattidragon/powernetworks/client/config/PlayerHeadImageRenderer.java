@@ -2,7 +2,7 @@ package io.github.mattidragon.powernetworks.client.config;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import dev.isxander.yacl3.gui.ImageRenderer;
+import dev.isxander.yacl3.gui.image.ImageRenderer;
 import net.minecraft.block.SkullBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -27,7 +27,7 @@ public class PlayerHeadImageRenderer implements ImageRenderer {
     }
 
     @Override
-    public int render(DrawContext graphics, int x, int y, int renderWidth) {
+    public int render(DrawContext graphics, int x, int y, int renderWidth, float tickDelta) {
         var client = MinecraftClient.getInstance();
         int size = renderWidth / 2;
         time += client.getLastFrameDuration();

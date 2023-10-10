@@ -1,7 +1,7 @@
 package io.github.mattidragon.powernetworks;
 
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
-import eu.pb4.polymer.networking.api.PolymerServerNetworking;
+import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import io.github.mattidragon.configloader.api.ConfigManager;
 import io.github.mattidragon.powernetworks.block.ModBlocks;
 import io.github.mattidragon.powernetworks.config.ConfigData;

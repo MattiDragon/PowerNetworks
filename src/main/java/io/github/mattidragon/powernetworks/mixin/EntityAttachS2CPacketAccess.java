@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface EntityAttachS2CPacketAccess {
     @Mutable
     @Accessor
-    void setAttachedId(int value);
+    void setAttachedEntityId(int value);
 
     @Mutable
     @Accessor
-    void setHoldingId(int value);
+    void setHoldingEntityId(int value);
 }

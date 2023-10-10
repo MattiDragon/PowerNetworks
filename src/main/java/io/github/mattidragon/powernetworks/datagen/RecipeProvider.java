@@ -3,13 +3,11 @@ package io.github.mattidragon.powernetworks.datagen;
 import io.github.mattidragon.powernetworks.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.minecraft.data.server.recipe.RecipeJsonProvider;
+import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.book.RecipeCategory;
-
-import java.util.function.Consumer;
 
 public class RecipeProvider extends FabricRecipeProvider {
     RecipeProvider(FabricDataOutput output) {
@@ -17,7 +15,7 @@ public class RecipeProvider extends FabricRecipeProvider {
     }
 
     @Override
-    public void generate(Consumer<RecipeJsonProvider> exporter) {
+    public void generate(RecipeExporter exporter) {
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModItems.WIRE, 16)
                 .input('I', Items.COPPER_INGOT)
                 .input('N', Items.IRON_NUGGET)
@@ -32,7 +30,7 @@ public class RecipeProvider extends FabricRecipeProvider {
         createCoilRecipe(ModItems.ULTIMATE_COIL, Items.NETHERITE_INGOT, exporter);
     }
 
-    private static void createCoilRecipe(Item coil, Item material, Consumer<RecipeJsonProvider> exporter) {
+    private static void createCoilRecipe(Item coil, Item material, RecipeExporter exporter) {
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, coil, 2)
                 .input('I', material)
                 .input('W', ModItems.WIRE)

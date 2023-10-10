@@ -37,8 +37,8 @@ public class LeashSourceElement extends GenericEntityElement {
         // Packet constructor requires us to provide actual entities, but we don't have them, so we use unsafe and set the fields ourselves.
         var leashPacket = UnsafeUtil.createUnsafe(EntityAttachS2CPacket.class);
         var leashPacketAccess = (EntityAttachS2CPacketAccess) leashPacket;
-        leashPacketAccess.setHoldingId(targetId);
-        leashPacketAccess.setAttachedId(getEntityIds().getInt(0));
+        leashPacketAccess.setHoldingEntityId(targetId);
+        leashPacketAccess.setAttachedEntityId(getEntityIds().getInt(0));
         packetConsumer.accept(leashPacket);
     }
 }

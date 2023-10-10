@@ -17,12 +17,11 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static io.github.mattidragon.powernetworks.config.ConfigData.DEFAULT;
 
 public class ConfigClient {
-    public static final Function<Float, Text> FLOAT_FORMATTER;
+    public static final ValueFormatter<Float> FLOAT_FORMATTER;
 
     static {
         var format = NumberFormat.getNumberInstance(Locale.ROOT);
@@ -217,13 +216,13 @@ public class ConfigClient {
                         .name(Text.translatable("config.power_networks.client.wireWidth"))
                 .description(OptionDescription.of(Text.translatable("config.power_networks.client.wireWidth.description")))
                         .binding(DEFAULT.client().wireWidth(), instance::wireWidth, instance::wireWidth)
-                        .controller(option -> FloatFieldControllerBuilder.create(option).range(0f, 1f).valueFormatter(FLOAT_FORMATTER))
+                        .controller(option -> FloatFieldControllerBuilder.create(option).range(0f, 1f).formatValue(FLOAT_FORMATTER))
                         .build())
                 .option(Option.<Float>createBuilder()
                         .name(Text.translatable("config.power_networks.client.hangFactor"))
                 .description(OptionDescription.of(Text.translatable("config.power_networks.client.hangFactor.description")))
                         .binding(DEFAULT.client().hangFactor(), instance::hangFactor, instance::hangFactor)
-                        .controller(option -> FloatFieldControllerBuilder.create(option).range(0f, 1f).valueFormatter(FLOAT_FORMATTER))
+                        .controller(option -> FloatFieldControllerBuilder.create(option).range(0f, 1f).formatValue(FLOAT_FORMATTER))
                         .build())
                 .group(ListOption.<Color>createBuilder()
                         .initial(Color.BLACK)

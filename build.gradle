@@ -1,11 +1,11 @@
 plugins {
-	id 'fabric-loom' version '1.3-SNAPSHOT'
-    id 'io.github.juuxel.loom-vineflower' version '1.11.0'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 }
 
 version project.mod_version + "+mc.$minecraft_version"
 group project.maven_group
+base.archivesName = project.archives_base_name
 
 repositories {
     maven { url "https://maven.nucleoid.xyz" }
@@ -13,6 +13,8 @@ repositories {
     maven { url "https://maven.alexiil.uk/" }
     maven { url "https://maven.isxander.dev/releases" }
     maven { url "https://maven.terraformersmc.com" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url 'https://maven.quiltmc.org/repository/release/' }
     mavenLocal()
     maven { url "https://jitpack.io" }
 }
@@ -36,10 +38,10 @@ dependencies {
     modImplementation include("xyz.nucleoid:server-translations-api:$server_translation_api_version")
     modImplementation include("teamreborn:energy:$energy_version")
     modImplementation include("com.kneelawk:graphlib:$graphlib_version")
-    modImplementation include("com.github.mattidragon:ConfigToolkit:$configtoolkit_version")
-    annotationProcessor clientAnnotationProcessor("com.github.mattidragon:ConfigToolkit:$configtoolkit_version")
 
     // Config
+    modImplementation include("com.github.mattidragon:ConfigToolkit:$configtoolkit_version")
+    annotationProcessor clientAnnotationProcessor("com.github.mattidragon:ConfigToolkit:$configtoolkit_version")
     modImplementation include("dev.isxander.yacl:yet-another-config-lib-fabric:$yacl_version")
     modImplementation "com.terraformersmc:modmenu:$modmenu_version"
 
@@ -94,7 +96,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
-    archivesBaseName = project.archives_base_name
 	withSourcesJar()
 }
 
