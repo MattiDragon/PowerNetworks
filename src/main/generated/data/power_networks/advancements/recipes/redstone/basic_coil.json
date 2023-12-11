@@ -30,6 +30,5 @@
     "recipes": [
       "power_networks:basic_coil"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

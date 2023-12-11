@@ -1,5 +1,6 @@
 package io.github.mattidragon.powernetworks.block;
 
+import com.mojang.serialization.MapCodec;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
@@ -97,6 +98,11 @@ public class CoilBlock extends RodBlock implements PolymerBlock, PolymerClientDe
         } else {
             return ActionResult.PASS;
         }
+    }
+
+    @Override
+    protected MapCodec<? extends RodBlock> getCodec() {
+        return MapCodec.unit(this);
     }
 
     @Override

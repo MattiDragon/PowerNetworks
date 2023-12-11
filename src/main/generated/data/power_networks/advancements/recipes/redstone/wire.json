@@ -30,6 +30,5 @@
     "recipes": [
       "power_networks:wire"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

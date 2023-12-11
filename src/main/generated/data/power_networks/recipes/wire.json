@@ -16,6 +16,5 @@
   "result": {
     "count": 16,
     "item": "power_networks:wire"
-  },
-  "show_notification": true
+  }
 }

@@ -30,6 +30,5 @@
     "recipes": [
       "power_networks:ultimate_coil"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }
